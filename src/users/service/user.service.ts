@@ -73,4 +73,8 @@ export class UserService implements IUserService {
 
     return this.userRepository.findUser(where, select);
   }
+
+  searchUsers(query: string): Promise<User[]> {
+    return this.userRepository.searchUsersByName(query.trim());
+  }
 }

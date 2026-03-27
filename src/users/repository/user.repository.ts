@@ -43,4 +43,14 @@ export class UserRepository extends BaseRepository<User> {
       select,
     });
   }
+
+  searchUsersByName(query: string): Promise<User[]> {
+    return this.repository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.profile', 'profile')
+      .where('user.name ILIKE :query', { query: `%${query}%` })
+      .orderBy('user.createdAt', 'DESC')
+      .take(10)
+      .getMany();
+  }
 }
