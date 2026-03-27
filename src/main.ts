@@ -2,18 +2,22 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
-import * as passport from 'passport';
+import passport from 'passport';
 import session from 'express-session';
 import { TypeormStore } from 'connect-typeorm';
 import { DataSource } from 'typeorm';
 import { Session as SessionEntity } from './session/entities/session.entity';
 
-const passportMiddleware = (passport as any).default ?? passport;
 const bootstrapLogger = new Logger('Bootstrap');
 
 async function bootstrap() {
   const { PORT, COOKIE_SECRET, COOKIE_EXPIRES_IN } = process.env;
-  const port = PORT ?? 8000;
+  const port = Number(PORT ?? 8000);
+
+  if (!COOKIE_SECRET) {
+    throw new Error('COOKIE_SECRET is required');
+  }
+
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   const dataSource = app.get(DataSource);
@@ -31,7 +35,7 @@ async function bootstrap() {
   );
   app.use(
     session({
-      secret: COOKIE_SECRET!,
+      secret: COOKIE_SECRET,
       saveUninitialized: false,
       resave: false,
       name: 'CHAT_SESSION_ID',
@@ -42,11 +46,10 @@ async function bootstrap() {
     }),
   );
 
-  app.use(passportMiddleware.initialize());
-  app.use(passportMiddleware.session());
+  app.use(passport.initialize());
+  app.use(passport.session());
 
-  await app.listen(port, () => {
-    bootstrapLogger.log(`Running on Port ${port}`);
-  });
+  await app.listen(port);
+  bootstrapLogger.log(`Running on Port ${port}`);
 }
-bootstrap();
+void bootstrap();

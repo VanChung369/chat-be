@@ -1,15 +1,13 @@
-import { Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
-import { UserService } from '../service/user.service';
-import { AuthenticatedGuard } from 'src/auth/guards/access.guard';
+import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import type { Request } from 'express';
+import { AuthenticatedGuard } from '../../auth/guards/access.guard';
 import { User } from '../entities/user.entity';
 
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
-
   @Get('me')
   @UseGuards(AuthenticatedGuard)
-  async me(@Req() request: Request & { user: User }) {
+  me(@Req() request: Request & { user: User }): User {
     return request.user;
   }
 }

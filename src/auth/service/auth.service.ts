@@ -7,11 +7,11 @@ import {
 } from '@nestjs/common';
 
 import { User } from '../../users/entities/user.entity';
+import { UserService } from '../../users/service/user.service';
+import { compareHash, hashPassword } from '../../common/utils/hash';
 import { RegisterDto } from '../dto/register.dto';
 import { IAuthService } from '../interfaces/auth.service.interface';
 import { ValidateUserLogin } from '../types';
-import { UserService } from 'src/users/service/user.service';
-import { compareHash, hashPassword } from 'src/common/utils/hash';
 
 @Injectable()
 export class AuthService implements IAuthService {

@@ -1,5 +1,5 @@
-import { User } from 'src/users/entities/user.entity';
 import type { Request } from 'express';
+import { User } from '../../users/entities/user.entity';
 
 export type ValidateUserLogin = {
   email: string;

@@ -1,7 +1,7 @@
 import {
   Body,
   Controller,
-  HttpStatus,
+  InternalServerErrorException,
   Logger,
   Post,
   Req,
@@ -32,15 +32,18 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   login(@Res() res: Response) {
     this.logger.log('Login route completed with LocalAuthGuard');
-    return res.send(HttpStatus.OK);
+    return res.sendStatus(200);
   }
 
   @Post('logout')
   @UseGuards(AuthenticatedGuard)
   logout(@Req() req: AuthenticatedRequest, @Res() res: Response) {
     this.logger.log('Logout route called');
-    return req.logout(() => {
-      return res.send(HttpStatus.OK);
+    return req.logout((error) => {
+      if (error) {
+        throw new InternalServerErrorException('Logout failed');
+      }
+      return res.sendStatus(200);
     });
   }
 }
