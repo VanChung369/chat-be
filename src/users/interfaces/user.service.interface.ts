@@ -14,4 +14,6 @@ export interface IUserService {
     email: string;
     password: string;
   }): Promise<Partial<User>>;
+
+  searchUsers(query: string): Promise<User[]>;
 }
