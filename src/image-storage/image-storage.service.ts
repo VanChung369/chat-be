@@ -72,13 +72,23 @@ export class ImageStorageService implements IImageStorageService {
       formData.set('folder', uploadFolder);
     }
 
-    const response = await fetch(IMAGEKIT_UPLOAD_URL, {
-      method: 'POST',
-      headers: {
-        Authorization: `Basic ${Buffer.from(`${privateKey}:`).toString('base64')}`,
-      },
-      body: formData,
-    });
+    let response: Response;
+    try {
+      response = await fetch(IMAGEKIT_UPLOAD_URL, {
+        method: 'POST',
+        headers: {
+          Authorization: `Basic ${Buffer.from(`${privateKey}:`).toString('base64')}`,
+        },
+        body: formData,
+      });
+    } catch (error) {
+      this.logger.error(
+        `Failed to upload image to ImageKit: ${error instanceof Error ? error.message : String(error)}`,
+      );
+      throw new BadRequestException(
+        'Image upload failed due to a network error',
+      );
+    }
 
     const payloadUnknown: unknown = await response.json();
     if (!response.ok) {
