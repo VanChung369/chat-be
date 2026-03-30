@@ -38,6 +38,9 @@ export class User {
   @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 
+  @Column({ default: false })
+  isVerified: boolean;
+
   @OneToOne(() => Profile, { cascade: ['insert', 'update'] })
   @JoinColumn()
   profile: Profile;

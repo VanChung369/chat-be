@@ -1,10 +1,15 @@
 import { existsSync } from 'node:fs';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
-import { UserModule } from './users/user.module';
+import { BullModule } from '@nestjs/bullmq';
+import { CacheModule } from '@nestjs/cache-manager';
+import { redisStore } from 'cache-manager-redis-yet';
+import { AppController } from './app.controller.js';
+import { AppService } from './app.service.js';
+import { AuthModule } from './auth/auth.module.js';
+import { UserModule } from './users/user.module.js';
+import { PeerModule } from './peer/peer.module.js';
+import { MailModule } from './mail/mail.module.js';
 
 if (existsSync('.env')) {
   process.loadEnvFile('.env');
@@ -27,8 +32,27 @@ const dbSsl = process.env.DB_SSL !== 'false';
       logging: dbLogging,
       autoLoadEntities: true,
     }),
+    BullModule.forRoot({
+      connection: {
+        host: process.env.REDIS_HOST || 'localhost',
+        port: parseInt(process.env.REDIS_PORT || '6379', 10),
+      },
+    }),
+    CacheModule.registerAsync({
+      isGlobal: true,
+      useFactory: async () => ({
+        store: await redisStore({
+          socket: {
+            host: process.env.REDIS_HOST || 'localhost',
+            port: parseInt(process.env.REDIS_PORT || '6379', 10),
+          },
+        }),
+      }),
+    }),
     AuthModule,
     UserModule,
+    PeerModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],
