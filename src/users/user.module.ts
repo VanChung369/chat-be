@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserController } from './controller/user.controller';
 import { UserProfileController } from './controller/user-profile.controller';
-import { User } from './entities/user.entity';
+import { User } from '../common/entities/user.entity';
 import { UserRepository } from './repository/user.repository';
 import { UserService } from './service/user.service';
-import { Profile } from './entities/profile.entity';
+import { Profile } from '../common/entities/profile.entity';
 import { UserProfileService } from './service/user-profile.service';
 import { ImageStorageModule } from '../image-storage/image-storage.module';
 

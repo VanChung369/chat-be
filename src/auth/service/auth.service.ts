@@ -6,7 +6,7 @@ import {
   Logger,
 } from '@nestjs/common';
 
-import { User } from '../../users/entities/user.entity';
+import { User } from '../../common/entities/user.entity';
 import { UserService } from '../../users/service/user.service';
 import { compareHash, hashPassword } from '../../common/utils/hash';
 import { RegisterDto } from '../dto/register.dto';

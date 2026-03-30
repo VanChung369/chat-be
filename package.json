@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@imagekit/javascript": "^5.2.2",
+    "@nestjs-modules/mailer": "^2.3.4",
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.0.1",
     "@nestjs/passport": "^11.0.5",
@@ -30,6 +31,7 @@
     "class-validator": "^0.15.1",
     "connect-typeorm": "^2.0.0",
     "cookie-parser": "^1.4.7",
+    "nodemailer": "^8.0.4",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
     "pg": "^8.20.0",

@@ -9,6 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Profile } from './profile.entity';
+import { Peer } from './peer.entity';
 
 @Entity('users')
 export class User {
@@ -40,4 +41,8 @@ export class User {
   @OneToOne(() => Profile, { cascade: ['insert', 'update'] })
   @JoinColumn()
   profile: Profile;
+
+  @OneToOne(() => Peer, { cascade: ['insert', 'remove', 'update'] })
+  @JoinColumn()
+  peer: Peer;
 }

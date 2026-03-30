@@ -4,8 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UpdateUserProfileParams } from '../../common/utils/types';
 import { ImageStorageService } from '../../image-storage/image-storage.service';
-import { Profile } from '../entities/profile.entity';
-import { User } from '../entities/user.entity';
+import { Profile } from '../../common/entities/profile.entity';
+import { User } from '../../common/entities/user.entity';
 import { UserRepository } from '../repository/user.repository';
 import { IUserProfileService } from '../interfaces/user-profile.service.interface';
 

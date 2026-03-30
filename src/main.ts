@@ -6,7 +6,7 @@ import passport from 'passport';
 import session from 'express-session';
 import { TypeormStore } from 'connect-typeorm';
 import { DataSource } from 'typeorm';
-import { Session as SessionEntity } from './session/entities/session.entity';
+import { Session as SessionEntity } from './common/entities/session.entity';
 
 const bootstrapLogger = new Logger('Bootstrap');
 
