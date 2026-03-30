@@ -20,7 +20,7 @@ export class MailProcessor extends WorkerHost {
           const { email, code } = job.data;
           await this.mailerService.sendMail({
             to: email,
-            subject: 'Xác thực tài khoản Chat App của bạn',
+            subject: 'Verify your email',
             template: 'verification',
             context: {
               code,
