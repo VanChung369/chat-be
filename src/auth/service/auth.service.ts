@@ -5,6 +5,7 @@ import {
   Injectable,
   Logger,
 } from '@nestjs/common';
+import { AuthVerifyService } from './auth-verify.service.js';
 
 import { User } from '../../common/entities/user.entity';
 import { UserService } from '../../users/service/user.service';
@@ -17,7 +18,10 @@ import { ValidateUserLogin } from '../types';
 export class AuthService implements IAuthService {
   private readonly logger = new Logger(AuthService.name);
 
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly authVerifyService: AuthVerifyService,
+  ) {}
 
   async register(registerDto: RegisterDto) {
     this.logger.log(`Register attempt for email: ${registerDto.email}`);
@@ -39,7 +43,27 @@ export class AuthService implements IAuthService {
       password,
     });
 
+    // Send verification code to queue
+    await this.authVerifyService.sendVerificationCode(registerDto.email);
+
     return createdUser;
+  }
+
+  async verifyEmail(email: string, code: string): Promise<boolean> {
+    const isValid = await this.authVerifyService.verifyCode(email, code);
+    if (isValid) {
+      await this.userService.verifyUser(email);
+      return true;
+    }
+    return false;
+  }
+
+  async resendVerificationCode(email: string): Promise<void> {
+    const user = await this.userService.findUser({ email });
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    await this.authVerifyService.sendVerificationCode(email);
   }
 
   async validateUser(userCredentials: ValidateUserLogin): Promise<User | null> {

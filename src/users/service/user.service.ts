@@ -23,6 +23,7 @@ export class UserService implements IUserService {
       lastName: params.lastName,
       email: params.email,
       password: params.password,
+      peer: {},
     });
 
     return instanceToPlain(await this.userRepository.save(user));
@@ -76,5 +77,9 @@ export class UserService implements IUserService {
 
   searchUsers(query: string): Promise<User[]> {
     return this.userRepository.searchUsersByName(query.trim());
+  }
+
+  async verifyUser(email: string): Promise<void> {
+    await this.userRepository.update({ email }, { isVerified: true });
   }
 }
