@@ -16,7 +16,7 @@ import type {
   UserProfileFiles,
 } from '../../common/utils/types';
 import { UpdateUserProfileDto } from '../dto/update-user-profile.dto';
-import { User } from '../entities/user.entity';
+import { User } from '../../common/entities/user.entity';
 import { UserProfileService } from '../service/user-profile.service';
 
 @UseGuards(AuthenticatedGuard)

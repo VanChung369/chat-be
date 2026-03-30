@@ -1,5 +1,5 @@
 import { FindUserOptions, FindUserParams } from '../../common/utils/types';
-import { User } from '../entities/user.entity';
+import { User } from '../../common/entities/user.entity';
 
 export interface IUserService {
   findUser(

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { FindOptionsSelect, FindOptionsWhere } from 'typeorm';
 import { instanceToPlain } from 'class-transformer';
 import { FindUserOptions, FindUserParams } from '../../common/utils/types';
-import { User } from '../entities/user.entity';
+import { User } from '../../common/entities/user.entity';
 import { UserRepository } from '../repository/user.repository';
 import { IUserService } from '../interfaces/user.service.interface';
 
