@@ -80,6 +80,10 @@ export class AuthService implements IAuthService {
       throw new HttpException('Invalid Credentials', HttpStatus.UNAUTHORIZED);
     }
 
+    if (!user.isVerified) {
+      throw new HttpException('User not verified', HttpStatus.FORBIDDEN);
+    }
+
     const isPasswordValid = await compareHash(
       userCredentials.password,
       user.password,
