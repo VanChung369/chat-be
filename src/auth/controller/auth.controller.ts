@@ -12,6 +12,8 @@ import {
 } from '@nestjs/common';
 import { AuthService } from '../service/auth.service';
 import { RegisterDto } from '../dto/register.dto';
+import { ForgotPasswordDto } from '../dto/forgot-password.dto';
+import { ResetPasswordDto } from '../dto/reset-password.dto';
 import { AuthenticatedGuard, LocalAuthGuard } from '../guards/access.guard';
 import type { Response } from 'express';
 import type { AuthenticatedRequest } from '../types';
@@ -49,8 +51,43 @@ export class AuthController {
     });
   }
 
+  @Post('forgot-password')
+  async forgotPassword(
+    @Body() forgotPasswordDto: ForgotPasswordDto,
+    @Res() res: Response,
+  ) {
+    this.logger.log(
+      `Forgot password request for email: ${forgotPasswordDto.email}`,
+    );
+    await this.authService.forgotPassword(forgotPasswordDto.email);
+    return res
+      .status(HttpStatus.OK)
+      .json({ message: 'Reset password code sent to your email' });
+  }
+
+  @Post('reset-password')
+  async resetPassword(
+    @Body() resetPasswordDto: ResetPasswordDto,
+    @Res() res: Response,
+  ) {
+    this.logger.log(
+      `Reset password attempt for email: ${resetPasswordDto.email}`,
+    );
+    await this.authService.resetPassword(
+      resetPasswordDto.email,
+      resetPasswordDto.code,
+      resetPasswordDto.newPassword,
+    );
+    return res
+      .status(HttpStatus.OK)
+      .json({ message: 'Password reset successfully' });
+  }
+
   @Post('verify')
-  async verifyEmail(@Body() body: { email: string; code: string }) {
+  async verifyEmail(
+    @Body() body: { email: string; code: string },
+    @Res() res: Response,
+  ) {
     const isValid = await this.authService.verifyEmail(body.email, body.code);
     if (!isValid) {
       throw new HttpException(
@@ -58,12 +95,16 @@ export class AuthController {
         HttpStatus.BAD_REQUEST,
       );
     }
-    return { message: 'Email verified successfully' };
+    return res
+      .status(HttpStatus.OK)
+      .json({ message: 'Email verified successfully' });
   }
 
-  @Post('resend-code')
-  async resendCode(@Body('email') email: string) {
+  @Post('resend-code  ')
+  async resendCode(@Body('email') email: string, @Res() res: Response) {
     await this.authService.resendVerificationCode(email);
-    return { message: 'Resend verification code successfully' };
+    return res
+      .status(HttpStatus.OK)
+      .json({ message: 'Resend verification code successfully' });
   }
 }

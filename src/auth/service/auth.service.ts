@@ -66,6 +66,31 @@ export class AuthService implements IAuthService {
     await this.authVerifyService.sendVerificationCode(email);
   }
 
+  async forgotPassword(email: string): Promise<void> {
+    const user = await this.userService.findUser({ email });
+    if (!user) {
+      // For security reasons, don't reveal if user exists?
+      // But typically we show an error or just say "if email exists, we sent it"
+      // Let's throw a 404 for now to be clear for the developer.
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    await this.authVerifyService.sendResetPasswordCode(email);
+  }
+
+  async resetPassword(
+    email: string,
+    code: string,
+    newPassword: string,
+  ): Promise<void> {
+    const isValid = await this.authVerifyService.verifyResetCode(email, code);
+    if (!isValid) {
+      throw new HttpException('Invalid or expired code', HttpStatus.BAD_REQUEST);
+    }
+
+    const hashedPassword = await hashPassword(newPassword);
+    await this.userService.updatePassword(email, hashedPassword);
+  }
+
   async validateUser(userCredentials: ValidateUserLogin): Promise<User | null> {
     this.logger.log(
       `Login validation attempt for email: ${userCredentials.email}`,
