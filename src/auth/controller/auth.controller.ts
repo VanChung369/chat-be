@@ -100,7 +100,7 @@ export class AuthController {
       .json({ message: 'Email verified successfully' });
   }
 
-  @Post('resend-code  ')
+  @Post('resend-code')
   async resendCode(@Body('email') email: string, @Res() res: Response) {
     await this.authService.resendVerificationCode(email);
     return res
