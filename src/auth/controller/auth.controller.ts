@@ -34,7 +34,7 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   login(@Res() res: Response) {
     this.logger.log('Login route completed with LocalAuthGuard');
-    return res.sendStatus(200);
+    return res.status(HttpStatus.OK).json({ message: 'Login successful' });
   }
 
   @Post('logout')
@@ -45,7 +45,7 @@ export class AuthController {
       if (error) {
         throw new InternalServerErrorException('Logout failed');
       }
-      return res.sendStatus(200);
+      return res.status(HttpStatus.OK).json({ message: 'Logout successful' });
     });
   }
 

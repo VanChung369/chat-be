@@ -8,6 +8,7 @@ export type FindUserParams = Partial<{
   id: string;
   email: string;
   username: string;
+  isVerified?: boolean;
 }>;
 
 export type FindUserOptions = Partial<{

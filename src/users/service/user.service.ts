@@ -47,6 +47,10 @@ export class UserService implements IUserService {
       where.name = findUserParams.username;
     }
 
+    if (findUserParams.isVerified) {
+      where.isVerified = findUserParams.isVerified;
+    }
+
     if (Object.keys(where).length === 0) {
       return null;
     }
@@ -58,6 +62,7 @@ export class UserService implements IUserService {
           email: true,
           firstName: true,
           lastName: true,
+          isVerified: true,
           password: true,
           createdAt: true,
           updatedAt: true,
@@ -68,6 +73,7 @@ export class UserService implements IUserService {
           email: true,
           firstName: true,
           lastName: true,
+          isVerified: true,
           createdAt: true,
           updatedAt: true,
         };
