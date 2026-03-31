@@ -52,12 +52,17 @@ export class AuthController {
   }
 
   @Post('forgot-password')
-  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+  async forgotPassword(
+    @Body() forgotPasswordDto: ForgotPasswordDto,
+    @Res() res: Response,
+  ) {
     this.logger.log(
       `Forgot password request for email: ${forgotPasswordDto.email}`,
     );
     await this.authService.forgotPassword(forgotPasswordDto.email);
-    return { message: 'Reset password code sent to your email' };
+    return res
+      .status(HttpStatus.OK)
+      .json({ message: 'Reset password code sent to your email' });
   }
 
   @Post('reset-password')
