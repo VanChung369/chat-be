@@ -2,6 +2,8 @@ import {
   IsEmail,
   IsNotEmpty,
   IsString,
+  Length,
+  Matches,
   MaxLength,
   MinLength,
 } from 'class-validator';
@@ -28,7 +30,9 @@ export class RegisterDto {
 
   @IsNotEmpty()
   @IsString()
-  @MinLength(6)
-  @MaxLength(128)
+  @Length(6, 128, { message: 'Password must be between 6 and 128 characters' })
+  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>])/, {
+    message: 'Password complexity requirements not met.',
+  })
   password: string;
 }

@@ -88,4 +88,8 @@ export class UserService implements IUserService {
   async verifyUser(email: string): Promise<void> {
     await this.userRepository.update({ email }, { isVerified: true });
   }
+
+  async updatePassword(email: string, password: string): Promise<void> {
+    await this.userRepository.update({ email }, { password });
+  }
 }

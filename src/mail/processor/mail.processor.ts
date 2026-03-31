@@ -29,6 +29,19 @@ export class MailProcessor extends WorkerHost {
           this.logger.log(`Verification email sent successfully to: ${email}`);
           break;
         }
+        case 'send-reset-password-code': {
+          const { email, code } = job.data;
+          await this.mailerService.sendMail({
+            to: email,
+            subject: 'Reset your password',
+            template: 'reset-password',
+            context: {
+              code,
+            },
+          });
+          this.logger.log(`Reset password email sent successfully to: ${email}`);
+          break;
+        }
         default:
           this.logger.warn(`Unknown job name: ${job.name}`);
           break;

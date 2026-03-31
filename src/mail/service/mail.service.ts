@@ -19,4 +19,18 @@ export class MailService {
       this.logger.error(`Error adding mail job for ${email}: ${error.message}`);
     }
   }
+
+  async sendResetPasswordEmail(email: string, code: string) {
+    try {
+      await this.mailQueue.add('send-reset-password-code', {
+        email,
+        code,
+      });
+      this.logger.log(`Password reset email job added for: ${email}`);
+    } catch (error) {
+      this.logger.error(
+        `Error adding password reset mail job for ${email}: ${error.message}`,
+      );
+    }
+  }
 }
