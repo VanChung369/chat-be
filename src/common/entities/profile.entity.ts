@@ -4,7 +4,7 @@ import { User } from './user.entity';
 @Entity({ name: 'profiles' })
 export class Profile {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column({ default: '' })
   about?: string;
@@ -16,5 +16,5 @@ export class Profile {
   banner?: string;
 
   @OneToOne(() => User)
-  user: User;
+  user: User | undefined;
 }

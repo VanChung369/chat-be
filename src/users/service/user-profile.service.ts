@@ -34,6 +34,10 @@ export class UserProfileService implements IUserProfileService {
   ): Promise<User> {
     await this.ensureProfile(user);
 
+    if (!user.profile) {
+      throw new Error('Profile could not be created');
+    }
+
     if (params.avatar) {
       const uploadedAvatar = await this.imageStorageService.upload({
         file: params.avatar,

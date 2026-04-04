@@ -14,11 +14,11 @@ export class Session implements ISession {
   expiredAt: number = Date.now();
 
   @PrimaryColumn('varchar', { length: 255 })
-  id: string;
+  id!: string;
 
   @Column('text')
-  json: string;
+  json!: string;
 
   @DeleteDateColumn()
-  destroyedAt: Date;
+  destroyedAt: Date | undefined;
 }
