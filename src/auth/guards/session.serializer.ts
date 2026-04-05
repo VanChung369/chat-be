@@ -1,14 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { PassportSerializer } from '@nestjs/passport';
 import { User } from '../../common/entities/user.entity';
-import { UserService } from '../../users/service/user.service';
+import { USER_SERVICE_TOKEN } from '../../users/interfaces/user.service.interface';
+import type { IUserService } from '../../users/interfaces/user.service.interface';
 
 type SerializeDone = (error: Error | null, userId?: string) => void;
 type DeserializeDone = (error: Error | null, user?: User | null) => void;
 
 @Injectable()
 export class SessionSerializer extends PassportSerializer {
-  constructor(private readonly userService: UserService) {
+  constructor(
+    @Inject(USER_SERVICE_TOKEN)
+    private readonly userService: IUserService,
+  ) {
     super();
   }
 
@@ -21,3 +25,5 @@ export class SessionSerializer extends PassportSerializer {
     done(null, userDb);
   }
 }
+
+

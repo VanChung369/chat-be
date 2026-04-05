@@ -16,7 +16,7 @@ export class UserRepository extends BaseRepository<User> {
   findById(id: string): Promise<User | null> {
     return this.findOne({
       where: { id },
-      relations: { profile: true },
+      relations: { profile: true, presence: true },
     });
   }
 
@@ -39,7 +39,7 @@ export class UserRepository extends BaseRepository<User> {
   ): Promise<User | null> {
     return this.repository.findOne({
       where,
-      relations: { profile: true },
+      relations: { profile: true, presence: true },
       select,
     });
   }
@@ -54,3 +54,4 @@ export class UserRepository extends BaseRepository<User> {
       .getMany();
   }
 }
+

@@ -4,8 +4,8 @@ import { User } from './user.entity';
 @Entity()
 export class Peer {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @OneToOne(() => User, (user) => user.peer)
-  user: User;
+  user: User | undefined;
 }

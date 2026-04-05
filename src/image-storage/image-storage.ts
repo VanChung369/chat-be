@@ -1,5 +1,7 @@
 import { UploadedFile } from '../common/utils/types';
 
+export const IMAGE_STORAGE_SERVICE_TOKEN = Symbol('IMAGE_STORAGE_SERVICE_TOKEN');
+
 export type UploadImageParams = {
   file: UploadedFile;
   fileName: string;

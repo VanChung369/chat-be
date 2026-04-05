@@ -21,6 +21,12 @@ export type UpdateUserProfileParams = Partial<{
   banner: UploadedFile;
 }>;
 
+export type UpdateUserPresenceParams = Partial<{
+  statusMessage: string;
+  showOffline: boolean;
+}>;
+
 export type UserProfileFiles = Partial<
   Record<'avatar' | 'banner', UploadedFile[]>
 >;
+

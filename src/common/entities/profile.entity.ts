@@ -3,18 +3,19 @@ import { User } from './user.entity';
 
 @Entity({ name: 'profiles' })
 export class Profile {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
 
-  @Column({ default: '' })
+  @Column({ type: 'varchar', default: '' })
   about?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   avatar?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   banner?: string;
 
   @OneToOne(() => User)
-  user: User;
+  user: User | undefined;
 }
+

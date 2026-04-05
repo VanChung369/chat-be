@@ -2,13 +2,15 @@ import {
   ConflictException,
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
   Logger,
 } from '@nestjs/common';
 import { AuthVerifyService } from './auth-verify.service.js';
 
 import { User } from '../../common/entities/user.entity';
-import { UserService } from '../../users/service/user.service';
+import { USER_SERVICE_TOKEN } from '../../users/interfaces/user.service.interface';
+import type { IUserService } from '../../users/interfaces/user.service.interface';
 import { compareHash, hashPassword } from '../../common/utils/hash';
 import { RegisterDto } from '../dto/register.dto';
 import { IAuthService } from '../interfaces/auth.service.interface';
@@ -19,7 +21,8 @@ export class AuthService implements IAuthService {
   private readonly logger = new Logger(AuthService.name);
 
   constructor(
-    private readonly userService: UserService,
+    @Inject(USER_SERVICE_TOKEN)
+    private readonly userService: IUserService,
     private readonly authVerifyService: AuthVerifyService,
   ) {}
 
@@ -43,7 +46,6 @@ export class AuthService implements IAuthService {
       password,
     });
 
-    // Send verification code to queue
     await this.authVerifyService.sendVerificationCode(registerDto.email);
 
     return createdUser;
@@ -69,9 +71,6 @@ export class AuthService implements IAuthService {
   async forgotPassword(email: string): Promise<void> {
     const user = await this.userService.findUser({ email });
     if (!user) {
-      // For security reasons, don't reveal if user exists?
-      // But typically we show an error or just say "if email exists, we sent it"
-      // Let's throw a 404 for now to be clear for the developer.
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
     await this.authVerifyService.sendResetPasswordCode(email);
@@ -121,3 +120,5 @@ export class AuthService implements IAuthService {
     return isPasswordValid ? user : null;
   }
 }
+
+
