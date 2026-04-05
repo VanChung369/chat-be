@@ -1,13 +1,17 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
-import { AuthService } from '../service/auth.service';
+import { AUTH_SERVICE_TOKEN } from '../interfaces/auth.service.interface';
+import type { IAuthService } from '../interfaces/auth.service.interface';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
   private readonly logger = new Logger(LocalStrategy.name);
 
-  constructor(private readonly authService: AuthService) {
+  constructor(
+    @Inject(AUTH_SERVICE_TOKEN)
+    private readonly authService: IAuthService,
+  ) {
     super({ usernameField: 'email' });
   }
 
@@ -21,3 +25,5 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     return user;
   }
 }
+
+

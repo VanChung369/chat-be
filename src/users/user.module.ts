@@ -12,6 +12,9 @@ import { UserProfileService } from './service/user-profile.service';
 import { UserPresenceService } from './service/user-presence.service';
 import { ImageStorageModule } from '../image-storage/image-storage.module';
 import { UserPresence } from 'src/common/entities/user-presence.entity';
+import { USER_SERVICE_TOKEN } from './interfaces/user.service.interface';
+import { USER_PROFILE_SERVICE_TOKEN } from './interfaces/user-profile.service.interface';
+import { USER_PRESENCE_SERVICE_TOKEN } from './interfaces/user-presence.service.interface';
 
 @Module({
   imports: [
@@ -19,8 +22,23 @@ import { UserPresence } from 'src/common/entities/user-presence.entity';
     ImageStorageModule,
   ],
   controllers: [UserController, UserProfileController, UserPresenceController],
-  providers: [UserService, UserRepository, UserProfileService, UserPresenceService],
-  exports: [UserService, UserRepository, UserProfileService, UserPresenceService],
+  providers: [
+    UserService,
+    UserRepository,
+    UserProfileService,
+    UserPresenceService,
+    { provide: USER_SERVICE_TOKEN, useExisting: UserService },
+    { provide: USER_PROFILE_SERVICE_TOKEN, useExisting: UserProfileService },
+    { provide: USER_PRESENCE_SERVICE_TOKEN, useExisting: UserPresenceService },
+  ],
+  exports: [
+    UserRepository,
+    UserService,
+    UserProfileService,
+    UserPresenceService,
+    USER_SERVICE_TOKEN,
+    USER_PROFILE_SERVICE_TOKEN,
+    USER_PRESENCE_SERVICE_TOKEN,
+  ],
 })
 export class UserModule {}
-

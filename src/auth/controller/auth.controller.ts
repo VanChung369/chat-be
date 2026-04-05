@@ -3,6 +3,7 @@ import {
   Controller,
   HttpException,
   HttpStatus,
+  Inject,
   InternalServerErrorException,
   Logger,
   Post,
@@ -10,7 +11,8 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { AuthService } from '../service/auth.service';
+import { AUTH_SERVICE_TOKEN } from '../interfaces/auth.service.interface';
+import type { IAuthService } from '../interfaces/auth.service.interface';
 import { RegisterDto } from '../dto/register.dto';
 import { ForgotPasswordDto } from '../dto/forgot-password.dto';
 import { ResetPasswordDto } from '../dto/reset-password.dto';
@@ -22,7 +24,10 @@ import type { AuthenticatedRequest } from '../types';
 export class AuthController {
   private readonly logger = new Logger(AuthController.name);
 
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    @Inject(AUTH_SERVICE_TOKEN)
+    private readonly authService: IAuthService,
+  ) {}
 
   @Post('register')
   register(@Body() registerDto: RegisterDto) {
@@ -108,3 +113,5 @@ export class AuthController {
       .json({ message: 'Resend verification code successfully' });
   }
 }
+
+

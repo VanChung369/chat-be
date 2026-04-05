@@ -4,23 +4,27 @@ import {
   Controller,
   Get,
   HttpStatus,
+  Inject,
   Query,
-  Req,
   UseGuards,
 } from '@nestjs/common';
-import type { Request } from 'express';
 import { AuthenticatedGuard } from '../../auth/guards/access.guard';
 import { User } from '../../common/entities/user.entity';
-import { UserService } from '../service/user.service';
+import { USER_SERVICE_TOKEN } from '../interfaces/user.service.interface';
+import type { IUserService } from '../interfaces/user.service.interface';
+import { AuthUser } from 'src/common/decorators/auth-user.decorator';
 
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    @Inject(USER_SERVICE_TOKEN)
+    private readonly userService: IUserService,
+  ) {}
 
   @Get('me')
   @UseGuards(AuthenticatedGuard)
-  me(@Req() request: Request & { user: User }): User {
-    return request.user;
+  me(@AuthUser() user: User): User {
+    return user;
   }
 
   @Get('check')

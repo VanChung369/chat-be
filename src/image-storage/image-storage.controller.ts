@@ -1,19 +1,24 @@
 import {
+  BadRequestException,
+  Body,
   Controller,
+  Inject,
   Post,
   UploadedFile,
   UseInterceptors,
-  Body,
   ValidationPipe,
-  BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ImageStorageService } from './image-storage.service';
+import { IMAGE_STORAGE_SERVICE_TOKEN } from './image-storage';
+import type { IImageStorageService } from './image-storage';
 import { UploadImageDto } from './dto/upload-image.dto';
 
 @Controller('image-storage')
 export class ImageStorageController {
-  constructor(private readonly imageStorageService: ImageStorageService) {}
+  constructor(
+    @Inject(IMAGE_STORAGE_SERVICE_TOKEN)
+    private readonly imageStorageService: IImageStorageService,
+  ) {}
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))

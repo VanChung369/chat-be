@@ -1,9 +1,10 @@
 import { randomUUID } from 'node:crypto';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UpdateUserProfileParams } from '../../common/utils/types';
-import { ImageStorageService } from '../../image-storage/image-storage.service';
+import { IMAGE_STORAGE_SERVICE_TOKEN } from '../../image-storage/image-storage';
+import type { IImageStorageService } from '../../image-storage/image-storage';
 import { Profile } from '../../common/entities/profile.entity';
 import { User } from '../../common/entities/user.entity';
 import { UserRepository } from '../repository/user.repository';
@@ -15,7 +16,8 @@ export class UserProfileService implements IUserProfileService {
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
     private readonly userRepository: UserRepository,
-    private readonly imageStorageService: ImageStorageService,
+    @Inject(IMAGE_STORAGE_SERVICE_TOKEN)
+    private readonly imageStorageService: IImageStorageService,
   ) {}
 
   private async ensureProfile(user: User): Promise<void> {
@@ -63,3 +65,5 @@ export class UserProfileService implements IUserProfileService {
     return this.userRepository.save(user);
   }
 }
+
+

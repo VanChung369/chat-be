@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Inject,
   Patch,
   Req,
   UploadedFiles,
@@ -17,17 +18,22 @@ import type {
 } from '../../common/utils/types';
 import { UpdateUserProfileDto } from '../dto/update-user-profile.dto';
 import { User } from '../../common/entities/user.entity';
-import { UserProfileService } from '../service/user-profile.service';
+import { USER_PROFILE_SERVICE_TOKEN } from '../interfaces/user-profile.service.interface';
+import type { IUserProfileService } from '../interfaces/user-profile.service.interface';
+import { AuthUser } from 'src/common/decorators/auth-user.decorator';
 
 @UseGuards(AuthenticatedGuard)
 @Controller('users/profiles')
 export class UserProfileController {
-  constructor(private readonly userProfileService: UserProfileService) {}
+  constructor(
+    @Inject(USER_PROFILE_SERVICE_TOKEN)
+    private readonly userProfileService: IUserProfileService,
+  ) {}
 
   @Patch()
   @UseInterceptors(FileFieldsInterceptor(USER_PROFILE_FILE_FIELDS))
   async updateUserProfile(
-    @Req() request: Request & { user: User },
+    @AuthUser() user: User,
     @UploadedFiles() files: UserProfileFiles,
     @Body() updateUserProfileDto: UpdateUserProfileDto,
   ) {
@@ -45,6 +51,6 @@ export class UserProfileController {
       params.banner = files.banner[0];
     }
 
-    return this.userProfileService.createProfileOrUpdate(request.user, params);
+    return this.userProfileService.createProfileOrUpdate(user, params);
   }
 }

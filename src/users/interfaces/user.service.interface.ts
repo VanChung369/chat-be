@@ -1,6 +1,8 @@
 import { FindUserOptions, FindUserParams } from '../../common/utils/types';
 import { User } from '../../common/entities/user.entity';
 
+export const USER_SERVICE_TOKEN = Symbol('USER_SERVICE_TOKEN');
+
 export interface IUserService {
   findUser(
     findUserParams: FindUserParams,
@@ -16,4 +18,6 @@ export interface IUserService {
   }): Promise<Partial<User>>;
 
   searchUsers(query: string): Promise<User[]>;
+  verifyUser(email: string): Promise<void>;
+  updatePassword(email: string, password: string): Promise<void>;
 }
