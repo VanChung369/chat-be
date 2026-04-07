@@ -19,6 +19,18 @@ export type UploadImageResult = {
   height?: number;
 };
 
+export type UploadTempImageResult = UploadImageResult & {
+  tempId: string;
+};
+
+export type ConfirmTempUploadParams = {
+  tempId: string;
+  folder: string;
+  fileName?: string;
+};
+
 export interface IImageStorageService {
   upload(params: UploadImageParams): Promise<UploadImageResult>;
+  uploadToTemp(params: UploadImageParams): Promise<UploadTempImageResult>;
+  confirmTempUpload(params: ConfirmTempUploadParams): Promise<UploadImageResult>;
 }

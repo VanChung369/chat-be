@@ -11,6 +11,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { IMAGE_STORAGE_SERVICE_TOKEN } from './image-storage';
 import type { IImageStorageService } from './image-storage';
+import { ConfirmTempUploadDto } from './dto/confirm-temp-upload.dto';
 import { UploadImageDto } from './dto/upload-image.dto';
 
 @Controller('image-storage')
@@ -35,14 +36,24 @@ export class ImageStorageController {
       throw new BadRequestException('File is required');
     }
 
-    return this.imageStorageService.upload({
+    return this.imageStorageService.uploadToTemp({
       file: {
         buffer: file.buffer,
         originalname: file.originalname,
         mimetype: file.mimetype,
       },
-      fileName: uploadImageDto.fileName,
-      folder: uploadImageDto.folder,
+      fileName: uploadImageDto.fileName || file.originalname,
+    });
+  }
+
+  @Post('confirm')
+  async confirm(
+    @Body(new ValidationPipe()) confirmTempUploadDto: ConfirmTempUploadDto,
+  ) {
+    return this.imageStorageService.confirmTempUpload({
+      tempId: confirmTempUploadDto.tempId,
+      folder: confirmTempUploadDto.folder,
+      fileName: confirmTempUploadDto.fileName,
     });
   }
 }
