@@ -9,7 +9,6 @@ import {
   Logger,
 } from '@nestjs/common';
 import type { Cache } from 'cache-manager';
-import { buildSrc } from '@imagekit/javascript';
 import {
   IMAGEKIT_API_BASE_URL,
   IMAGEKIT_UPLOAD_URL,
@@ -24,66 +23,18 @@ import type {
   UploadTempImageResult,
 } from '../../common/types';
 import type { IImageStorageService } from '../interfaces/image-storage.service.interface';
-
-type ImageKitUploadResponse = {
-  fileId: string;
-  name: string;
-  url?: string;
-  thumbnailUrl?: string;
-  filePath?: string;
-  size?: number;
-  width?: number;
-  height?: number;
-};
-
-type CachedUploadPayload = {
-  fileId: string;
-  filePath: string;
-};
-
-type ImageKitFile = {
-  fileId: string;
-  name: string;
-  filePath?: string;
-};
-
-function isImageKitUploadResponse(
-  value: unknown,
-): value is ImageKitUploadResponse {
-  if (typeof value !== 'object' || value === null) {
-    return false;
-  }
-
-  const data = value as Record<string, unknown>;
-  return typeof data.fileId === 'string' && typeof data.name === 'string';
-}
-
-function getErrorMessage(value: unknown): string | null {
-  if (typeof value !== 'object' || value === null) {
-    return null;
-  }
-
-  const data = value as Record<string, unknown>;
-  return typeof data.message === 'string' ? data.message : null;
-}
-
-function isCachedUploadPayload(value: unknown): value is CachedUploadPayload {
-  if (typeof value !== 'object' || value === null) {
-    return false;
-  }
-
-  const data = value as Record<string, unknown>;
-  return typeof data.fileId === 'string' && typeof data.filePath === 'string';
-}
-
-function isImageKitFile(value: unknown): value is ImageKitFile {
-  if (typeof value !== 'object' || value === null) {
-    return false;
-  }
-
-  const data = value as Record<string, unknown>;
-  return typeof data.fileId === 'string' && typeof data.name === 'string';
-}
+import {
+  getErrorMessage,
+  isCachedUploadPayload,
+  isImageKitFile,
+  isImageKitUploadResponse,
+} from '../utils/image-kit';
+import {
+  buildPublicUrl,
+  normalizeDestinationFolder,
+  normalizeFileName,
+} from '../utils/path';
+import type { CachedUploadPayload, ImageKitFile } from '../types/image-kit';
 
 @Injectable()
 export class ImageStorageService implements IImageStorageService {
@@ -151,9 +102,7 @@ export class ImageStorageService implements IImageStorageService {
 
     const publicUrl =
       payloadUnknown.url ||
-      (payloadUnknown.filePath
-        ? buildSrc({ urlEndpoint, src: payloadUnknown.filePath })
-        : '');
+      (payloadUnknown.filePath ? buildPublicUrl(payloadUnknown.filePath) : '');
 
     if (!publicUrl) {
       throw new BadRequestException('ImageKit did not return a public URL');
@@ -225,11 +174,11 @@ export class ImageStorageService implements IImageStorageService {
       throw new BadRequestException('Invalid temporary upload payload');
     }
 
-    const destinationFolder = this.normalizeDestinationFolder(params.folder);
+    const destinationFolder = normalizeDestinationFolder(params.folder);
     const fallbackFileName =
       posix.basename(cachedPayload.filePath) || params.tempId;
     const destinationFileName = params.fileName
-      ? this.normalizeFileName(params.fileName)
+      ? normalizeFileName(params.fileName)
       : fallbackFileName;
     const destinationPath = `${destinationFolder}/${destinationFileName}`;
 
@@ -239,7 +188,7 @@ export class ImageStorageService implements IImageStorageService {
     return {
       fileId: cachedPayload.fileId,
       name: destinationFileName,
-      url: this.buildPublicUrl(destinationPath),
+      url: buildPublicUrl(destinationPath),
       filePath: destinationPath,
     };
   }
@@ -280,60 +229,6 @@ export class ImageStorageService implements IImageStorageService {
 
   private getUploadCacheKey(tempId: string): string {
     return `${TEMP_UPLOAD_CACHE_KEY_PREFIX}${tempId}`;
-  }
-
-  private normalizeDestinationFolder(folder: string): string {
-    const normalizedFolder = folder.trim().replace(/\/+$/, '');
-
-    if (!normalizedFolder) {
-      throw new BadRequestException('Destination folder is required');
-    }
-
-    if (!normalizedFolder.startsWith('/')) {
-      throw new BadRequestException('Destination folder must start with "/"');
-    }
-
-    if (
-      normalizedFolder === TEMP_UPLOAD_FOLDER ||
-      normalizedFolder.startsWith(`${TEMP_UPLOAD_FOLDER}/`)
-    ) {
-      throw new BadRequestException('Destination folder cannot be /temp');
-    }
-
-    return normalizedFolder;
-  }
-
-  private normalizeFileName(fileName: string): string {
-    const normalizedFileName = fileName.trim();
-
-    if (!normalizedFileName) {
-      throw new BadRequestException('fileName cannot be empty');
-    }
-
-    if (
-      normalizedFileName.includes('/') ||
-      normalizedFileName.includes('\\') ||
-      normalizedFileName.includes('..')
-    ) {
-      throw new BadRequestException('Invalid fileName');
-    }
-
-    return normalizedFileName;
-  }
-
-  private buildPublicUrl(filePath: string): string {
-    const urlEndpoint = process.env.IMAGEKIT_URL_ENDPOINT;
-
-    if (!urlEndpoint) {
-      throw new BadRequestException(
-        'Missing ImageKit config: IMAGEKIT_URL_ENDPOINT',
-      );
-    }
-
-    return buildSrc({
-      urlEndpoint,
-      src: filePath,
-    });
   }
 
   private getImageKitAuthHeader(): string {

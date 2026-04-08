@@ -6,13 +6,14 @@ import {
   Post,
   UploadedFile,
   UseInterceptors,
-  ValidationPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { IMAGE_STORAGE_SERVICE_TOKEN } from '../interfaces/image-storage.service.interface';
 import type { IImageStorageService } from '../interfaces/image-storage.service.interface';
 import { ConfirmTempUploadDto } from '../dto/confirm-temp-upload.dto';
 import { UploadImageDto } from '../dto/upload-image.dto';
+import { mapUploadedFile } from '../../common/utils';
+import type { RequestUploadedFile } from '../../common/utils';
 
 @Controller('image-storage')
 export class ImageStorageController {
@@ -24,32 +25,38 @@ export class ImageStorageController {
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   async upload(
-    @UploadedFile()
-    file: {
-      buffer: Buffer;
-      originalname: string;
-      mimetype: string;
-    },
-    @Body(new ValidationPipe()) uploadImageDto: UploadImageDto,
+    @UploadedFile() file: RequestUploadedFile,
+    @Body() uploadImageDto: UploadImageDto,
   ) {
     if (!file) {
       throw new BadRequestException('File is required');
     }
 
     return this.imageStorageService.uploadToTemp({
-      file: {
-        buffer: file.buffer,
-        originalname: file.originalname,
-        mimetype: file.mimetype,
-      },
+      file: mapUploadedFile(file),
       fileName: uploadImageDto.fileName || file.originalname,
     });
   }
 
-  @Post('confirm')
-  async confirm(
-    @Body(new ValidationPipe()) confirmTempUploadDto: ConfirmTempUploadDto,
+  @Post('upload-direct')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadDirect(
+    @UploadedFile() file: RequestUploadedFile,
+    @Body() uploadImageDto: UploadImageDto,
   ) {
+    if (!file) {
+      throw new BadRequestException('File is required');
+    }
+
+    return this.imageStorageService.upload({
+      file: mapUploadedFile(file),
+      fileName: uploadImageDto.fileName || file.originalname,
+      folder: uploadImageDto.folder,
+    });
+  }
+
+  @Post('confirm')
+  async confirm(@Body() confirmTempUploadDto: ConfirmTempUploadDto) {
     return this.imageStorageService.confirmTempUpload({
       tempId: confirmTempUploadDto.tempId,
       folder: confirmTempUploadDto.folder,

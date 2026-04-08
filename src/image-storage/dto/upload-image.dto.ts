@@ -5,4 +5,9 @@ export class UploadImageDto {
   @IsOptional()
   @IsNotEmpty()
   fileName?: string;
+
+  @IsString()
+  @IsOptional()
+  @IsNotEmpty()
+  folder?: string;
 }
