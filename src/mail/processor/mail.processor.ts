@@ -39,7 +39,9 @@ export class MailProcessor extends WorkerHost {
               code,
             },
           });
-          this.logger.log(`Reset password email sent successfully to: ${email}`);
+          this.logger.log(
+            `Reset password email sent successfully to: ${email}`,
+          );
           break;
         }
         default:
@@ -47,7 +49,9 @@ export class MailProcessor extends WorkerHost {
           break;
       }
     } catch (error) {
-      this.logger.error(`Failed to process job ${job.id}: ${error.message}`);
+      this.logger.error(
+        `Failed to process job ${job.id}: ${error instanceof Error ? error.message : String(error)}`,
+      );
       throw error;
     }
   }

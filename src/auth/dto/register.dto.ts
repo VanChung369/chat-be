@@ -12,21 +12,21 @@ export class RegisterDto {
   @IsNotEmpty()
   @MinLength(3)
   @MaxLength(16)
-  username: string;
+  username!: string;
 
   @IsNotEmpty()
   @MinLength(2)
   @MaxLength(32)
-  firstName: string;
+  firstName!: string;
 
   @IsNotEmpty()
   @MinLength(2)
   @MaxLength(32)
-  lastName: string;
+  lastName!: string;
 
   @IsNotEmpty()
   @IsEmail()
-  email: string;
+  email!: string;
 
   @IsNotEmpty()
   @IsString()
@@ -34,5 +34,5 @@ export class RegisterDto {
   @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>])/, {
     message: 'Password complexity requirements not met.',
   })
-  password: string;
+  password!: string;
 }

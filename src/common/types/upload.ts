@@ -1,6 +1,8 @@
-import { UploadedFile } from '../common/utils/types';
-
-export const IMAGE_STORAGE_SERVICE_TOKEN = Symbol('IMAGE_STORAGE_SERVICE_TOKEN');
+export type UploadedFile = {
+  buffer: Buffer;
+  mimetype: string;
+  originalname: string;
+};
 
 export type UploadImageParams = {
   file: UploadedFile;
@@ -19,6 +21,12 @@ export type UploadImageResult = {
   height?: number;
 };
 
-export interface IImageStorageService {
-  upload(params: UploadImageParams): Promise<UploadImageResult>;
-}
+export type UploadTempImageResult = UploadImageResult & {
+  tempId: string;
+};
+
+export type ConfirmTempUploadParams = {
+  tempId: string;
+  folder: string;
+  fileName?: string;
+};

@@ -7,7 +7,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthenticatedGuard } from '../../auth/guards/access.guard';
-import { UpdateUserPresenceParams } from '../../common/utils/types';
+import { UpdateUserPresenceParams } from '../../common/types';
 import { User } from '../../common/entities/user.entity';
 import { UpdateUserPresenceDto } from '../dto/update-user-presence.dto';
 import { USER_PRESENCE_SERVICE_TOKEN } from '../interfaces/user-presence.service.interface';

@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BullModule } from '@nestjs/bullmq';
 import { CacheModule } from '@nestjs/cache-manager';
+import { ScheduleModule } from '@nestjs/schedule';
 import { redisStore } from 'cache-manager-redis-yet';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
@@ -49,6 +50,7 @@ const dbSsl = process.env.DB_SSL !== 'false';
         }),
       }),
     }),
+    ScheduleModule.forRoot(),
     AuthModule,
     UserModule,
     PeerModule,

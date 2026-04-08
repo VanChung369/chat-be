@@ -9,13 +9,13 @@ import { promisify } from 'node:util';
 const scrypt = promisify(scryptCallback);
 const KEY_LENGTH = 64;
 
-async function hashPassword(rawPassword: string): Promise<string> {
+export async function hashPassword(rawPassword: string): Promise<string> {
   const salt = randomBytes(16).toString('hex');
   const derivedKey = (await scrypt(rawPassword, salt, KEY_LENGTH)) as Buffer;
   return `${salt}:${derivedKey.toString('hex')}`;
 }
 
-async function compareHash(
+export async function compareHash(
   rawPassword: string,
   storedPassword: string,
 ): Promise<boolean> {
@@ -34,5 +34,3 @@ async function compareHash(
 
   return timingSafeEqual(storedKey, derivedKey);
 }
-
-export { hashPassword, compareHash };
