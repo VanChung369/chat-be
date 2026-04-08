@@ -47,6 +47,8 @@ type ImageKitFile = {
   filePath?: string;
 };
 
+const SAFE_FILE_NAME_REGEX = /^[A-Za-z0-9][A-Za-z0-9._ -]{0,254}$/;
+
 function isImageKitUploadResponse(
   value: unknown,
 ): value is ImageKitUploadResponse {
@@ -171,7 +173,9 @@ export class ImageStorageService implements IImageStorageService {
     };
   }
 
-  async uploadToTemp(params: UploadImageParams): Promise<UploadTempImageResult> {
+  async uploadToTemp(
+    params: UploadImageParams,
+  ): Promise<UploadTempImageResult> {
     const sourceName = params.fileName || params.file.originalname;
     const tempId = this.generateTempId(sourceName);
 
@@ -311,9 +315,9 @@ export class ImageStorageService implements IImageStorageService {
     }
 
     if (
-      normalizedFileName.includes('/') ||
-      normalizedFileName.includes('\\') ||
-      normalizedFileName.includes('..')
+      normalizedFileName === '.' ||
+      normalizedFileName === '..' ||
+      !SAFE_FILE_NAME_REGEX.test(normalizedFileName)
     ) {
       throw new BadRequestException('Invalid fileName');
     }
