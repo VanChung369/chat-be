@@ -120,7 +120,9 @@ export class ImageStorageService implements IImageStorageService {
     };
   }
 
-  async uploadToTemp(params: UploadImageParams): Promise<UploadTempImageResult> {
+  async uploadToTemp(
+    params: UploadImageParams,
+  ): Promise<UploadTempImageResult> {
     const sourceName = params.fileName || params.file.originalname;
     const tempId = this.generateTempId(sourceName);
 
