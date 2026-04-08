@@ -13,8 +13,8 @@ export type FindUserOptions = Partial<{
 
 export type UpdateUserProfileParams = Partial<{
   about: string;
-  avatar: UploadedFile;
-  banner: UploadedFile;
+  avatarUrl: string;
+  bannerUrl: string;
 }>;
 
 export type UpdateUserPresenceParams = Partial<{

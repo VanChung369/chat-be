@@ -3,23 +3,15 @@ import {
   Controller,
   Inject,
   Patch,
-  Req,
-  UploadedFiles,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { AuthenticatedGuard } from '../../auth/guards/access.guard';
-import type {
-  UpdateUserProfileParams,
-  UserProfileFiles,
-} from '../../common/types';
+import type { UpdateUserProfileParams } from '../../common/types';
 import { UpdateUserProfileDto } from '../dto/update-user-profile.dto';
 import { User } from '../../common/entities/user.entity';
 import { USER_PROFILE_SERVICE_TOKEN } from '../interfaces/user-profile.service.interface';
 import type { IUserProfileService } from '../interfaces/user-profile.service.interface';
 import { AuthUser } from 'src/common/decorators/auth-user.decorator';
-import { USER_PROFILE_FILE_FIELDS } from 'src/common/constants';
 
 @UseGuards(AuthenticatedGuard)
 @Controller('users/profiles')
@@ -30,24 +22,22 @@ export class UserProfileController {
   ) {}
 
   @Patch()
-  @UseInterceptors(FileFieldsInterceptor(USER_PROFILE_FILE_FIELDS))
   async updateUserProfile(
     @AuthUser() user: User,
-    @UploadedFiles() files: UserProfileFiles,
     @Body() updateUserProfileDto: UpdateUserProfileDto,
   ) {
     const params: UpdateUserProfileParams = {};
 
-    if (updateUserProfileDto.about) {
+    if (typeof updateUserProfileDto.about === 'string') {
       params.about = updateUserProfileDto.about;
     }
 
-    if (files.avatar?.[0]) {
-      params.avatar = files.avatar[0];
+    if (typeof updateUserProfileDto.avatarUrl === 'string') {
+      params.avatarUrl = updateUserProfileDto.avatarUrl;
     }
 
-    if (files.banner?.[0]) {
-      params.banner = files.banner[0];
+    if (typeof updateUserProfileDto.bannerUrl === 'string') {
+      params.bannerUrl = updateUserProfileDto.bannerUrl;
     }
 
     return this.userProfileService.createProfileOrUpdate(user, params);

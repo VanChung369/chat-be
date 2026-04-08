@@ -10,17 +10,13 @@ import { Profile } from '../common/entities/profile.entity';
 import { Peer } from '../common/entities/peer.entity';
 import { UserProfileService } from './service/user-profile.service';
 import { UserPresenceService } from './service/user-presence.service';
-import { ImageStorageModule } from '../image-storage/image-storage.module';
 import { UserPresence } from 'src/common/entities/user-presence.entity';
 import { USER_SERVICE_TOKEN } from './interfaces/user.service.interface';
 import { USER_PROFILE_SERVICE_TOKEN } from './interfaces/user-profile.service.interface';
 import { USER_PRESENCE_SERVICE_TOKEN } from './interfaces/user-presence.service.interface';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([User, Profile, Peer, UserPresence]),
-    ImageStorageModule,
-  ],
+  imports: [TypeOrmModule.forFeature([User, Profile, Peer, UserPresence])],
   controllers: [UserController, UserProfileController, UserPresenceController],
   providers: [
     UserService,
