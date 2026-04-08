@@ -2,7 +2,9 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Inject,
+  Param,
   Post,
   UploadedFile,
   UseInterceptors,
@@ -62,5 +64,10 @@ export class ImageStorageController {
       folder: confirmTempUploadDto.folder,
       fileName: confirmTempUploadDto.fileName,
     });
+  }
+
+  @Delete(':fileId')
+  async delete(@Param('fileId') fileId: string) {
+    return this.imageStorageService.delete(fileId);
   }
 }

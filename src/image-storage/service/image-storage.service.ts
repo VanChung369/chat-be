@@ -224,6 +224,14 @@ export class ImageStorageService implements IImageStorageService {
     }
   }
 
+  async delete(fileId: string): Promise<void> {
+    if (!fileId.trim()) {
+      throw new BadRequestException('fileId is required');
+    }
+
+    await this.deleteFile(fileId);
+  }
+
   private generateTempId(sourceName: string): string {
     const ext = posix.extname(sourceName).slice(0, 20);
     return `${randomUUID()}${ext}`;

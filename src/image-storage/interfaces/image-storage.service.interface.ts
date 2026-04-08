@@ -15,4 +15,5 @@ export interface IImageStorageService {
   confirmTempUpload(
     params: ConfirmTempUploadParams,
   ): Promise<UploadImageResult>;
+  delete(fileId: string): Promise<void>;
 }
