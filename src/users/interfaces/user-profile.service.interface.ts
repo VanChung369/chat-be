@@ -1,4 +1,4 @@
-import { UpdateUserProfileParams } from '../../common/utils/types';
+import { UpdateUserProfileParams } from '../../common/types';
 import { User } from '../../common/entities/user.entity';
 
 export const USER_PROFILE_SERVICE_TOKEN = Symbol('USER_PROFILE_SERVICE_TOKEN');

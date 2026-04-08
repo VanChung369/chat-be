@@ -5,7 +5,7 @@ import { MailService } from '../../mail/service/mail.service.js';
 import {
   TTL_RESET_PASSWORD_CODE,
   TTL_VERIFY_CODE,
-} from '../../common/constants/time';
+} from '../../common/constants';
 
 @Injectable()
 export class AuthVerifyService {

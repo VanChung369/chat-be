@@ -11,7 +11,7 @@ import { AuthVerifyService } from './auth-verify.service.js';
 import { User } from '../../common/entities/user.entity';
 import { USER_SERVICE_TOKEN } from '../../users/interfaces/user.service.interface';
 import type { IUserService } from '../../users/interfaces/user.service.interface';
-import { compareHash, hashPassword } from '../../common/utils/hash';
+import { compareHash, hashPassword } from '../../common/utils';
 import { RegisterDto } from '../dto/register.dto';
 import { IAuthService } from '../interfaces/auth.service.interface';
 import { ValidateUserLogin } from '../types';
@@ -83,7 +83,10 @@ export class AuthService implements IAuthService {
   ): Promise<void> {
     const isValid = await this.authVerifyService.verifyResetCode(email, code);
     if (!isValid) {
-      throw new HttpException('Invalid or expired code', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'Invalid or expired code',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const hashedPassword = await hashPassword(newPassword);
@@ -120,5 +123,3 @@ export class AuthService implements IAuthService {
     return isPasswordValid ? user : null;
   }
 }
-
-

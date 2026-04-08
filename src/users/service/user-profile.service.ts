@@ -2,10 +2,14 @@ import { randomUUID } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UpdateUserProfileParams } from '../../common/utils/types';
-import { IMAGE_STORAGE_SERVICE_TOKEN } from '../../image-storage/image-storage';
-import type { IImageStorageService } from '../../image-storage/image-storage';
+import {
+  USER_AVATAR_UPLOAD_FOLDER,
+  USER_BANNER_UPLOAD_FOLDER,
+} from '../../common/constants';
+import { UpdateUserProfileParams } from '../../common/types';
 import { Profile } from '../../common/entities/profile.entity';
+import { IMAGE_STORAGE_SERVICE_TOKEN } from '../../image-storage/interfaces/image-storage.service.interface';
+import type { IImageStorageService } from '../../image-storage/interfaces/image-storage.service.interface';
 import { User } from '../../common/entities/user.entity';
 import { UserRepository } from '../repository/user.repository';
 import { IUserProfileService } from '../interfaces/user-profile.service.interface';
@@ -44,7 +48,7 @@ export class UserProfileService implements IUserProfileService {
       const uploadedAvatar = await this.imageStorageService.upload({
         file: params.avatar,
         fileName: `avatar-${user.id}-${randomUUID()}`,
-        folder: '/chat-app/avatars',
+        folder: USER_AVATAR_UPLOAD_FOLDER,
       });
       user.profile.avatar = uploadedAvatar.url;
     }
@@ -53,7 +57,7 @@ export class UserProfileService implements IUserProfileService {
       const uploadedBanner = await this.imageStorageService.upload({
         file: params.banner,
         fileName: `banner-${user.id}-${randomUUID()}`,
-        folder: '/chat-app/banners',
+        folder: USER_BANNER_UPLOAD_FOLDER,
       });
       user.profile.banner = uploadedBanner.url;
     }
@@ -65,5 +69,3 @@ export class UserProfileService implements IUserProfileService {
     return this.userRepository.save(user);
   }
 }
-
-

@@ -11,12 +11,19 @@ import {
 import type { Cache } from 'cache-manager';
 import { buildSrc } from '@imagekit/javascript';
 import {
+  IMAGEKIT_API_BASE_URL,
+  IMAGEKIT_UPLOAD_URL,
+  TEMP_UPLOAD_CACHE_KEY_PREFIX,
+  TEMP_UPLOAD_CACHE_TTL_SECONDS,
+  TEMP_UPLOAD_FOLDER,
+} from '../../common/constants';
+import type {
   ConfirmTempUploadParams,
-  IImageStorageService,
   UploadImageParams,
   UploadImageResult,
   UploadTempImageResult,
-} from './image-storage';
+} from '../../common/types';
+import type { IImageStorageService } from '../interfaces/image-storage.service.interface';
 
 type ImageKitUploadResponse = {
   fileId: string;
@@ -39,12 +46,6 @@ type ImageKitFile = {
   name: string;
   filePath?: string;
 };
-
-const IMAGEKIT_UPLOAD_URL = 'https://upload.imagekit.io/api/v1/files/upload';
-const IMAGEKIT_API_BASE_URL = 'https://api.imagekit.io/v1';
-const TEMP_UPLOAD_FOLDER = '/temp';
-const TEMP_UPLOAD_CACHE_KEY_PREFIX = 'upload:';
-const TEMP_UPLOAD_CACHE_TTL_SECONDS = 3600;
 
 function isImageKitUploadResponse(
   value: unknown,
@@ -123,7 +124,7 @@ export class ImageStorageService implements IImageStorageService {
       response = await fetch(IMAGEKIT_UPLOAD_URL, {
         method: 'POST',
         headers: {
-          Authorization: `Basic ${Buffer.from(`${privateKey}:`).toString('base64')}`,
+          Authorization: this.getImageKitAuthHeader(),
         },
         body: formData,
       });
@@ -225,7 +226,8 @@ export class ImageStorageService implements IImageStorageService {
     }
 
     const destinationFolder = this.normalizeDestinationFolder(params.folder);
-    const fallbackFileName = posix.basename(cachedPayload.filePath) || params.tempId;
+    const fallbackFileName =
+      posix.basename(cachedPayload.filePath) || params.tempId;
     const destinationFileName = params.fileName
       ? this.normalizeFileName(params.fileName)
       : fallbackFileName;

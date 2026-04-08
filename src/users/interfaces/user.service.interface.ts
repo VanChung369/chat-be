@@ -1,4 +1,4 @@
-import { FindUserOptions, FindUserParams } from '../../common/utils/types';
+import { FindUserOptions, FindUserParams } from 'src/common/types';
 import { User } from '../../common/entities/user.entity';
 
 export const USER_SERVICE_TOKEN = Symbol('USER_SERVICE_TOKEN');

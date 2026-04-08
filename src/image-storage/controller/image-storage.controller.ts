@@ -9,10 +9,10 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { IMAGE_STORAGE_SERVICE_TOKEN } from './image-storage';
-import type { IImageStorageService } from './image-storage';
-import { ConfirmTempUploadDto } from './dto/confirm-temp-upload.dto';
-import { UploadImageDto } from './dto/upload-image.dto';
+import { IMAGE_STORAGE_SERVICE_TOKEN } from '../interfaces/image-storage.service.interface';
+import type { IImageStorageService } from '../interfaces/image-storage.service.interface';
+import { ConfirmTempUploadDto } from '../dto/confirm-temp-upload.dto';
+import { UploadImageDto } from '../dto/upload-image.dto';
 
 @Controller('image-storage')
 export class ImageStorageController {

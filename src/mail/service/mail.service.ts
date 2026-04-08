@@ -16,7 +16,9 @@ export class MailService {
       });
       this.logger.log(`Verification email job added for: ${email}`);
     } catch (error) {
-      this.logger.error(`Error adding mail job for ${email}: ${error.message}`);
+      this.logger.error(
+        `Error adding mail job for ${email}: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
   }
 
@@ -29,7 +31,7 @@ export class MailService {
       this.logger.log(`Password reset email job added for: ${email}`);
     } catch (error) {
       this.logger.error(
-        `Error adding password reset mail job for ${email}: ${error.message}`,
+        `Error adding password reset mail job for ${email}: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
   }

@@ -1,8 +1,4 @@
-export type UploadedFile = {
-  buffer: Buffer;
-  mimetype: string;
-  originalname: string;
-};
+import { UploadedFile } from './upload';
 
 export type FindUserParams = Partial<{
   id: string;
@@ -29,4 +25,3 @@ export type UpdateUserPresenceParams = Partial<{
 export type UserProfileFiles = Partial<
   Record<'avatar' | 'banner', UploadedFile[]>
 >;
-
