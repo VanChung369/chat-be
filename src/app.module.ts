@@ -11,6 +11,7 @@ import { AuthModule } from './auth/auth.module.js';
 import { UserModule } from './users/user.module.js';
 import { PeerModule } from './peer/peer.module.js';
 import { MailModule } from './mail/mail.module.js';
+import { ImageStorageModule } from './image-storage/image-storage.module.js';
 
 if (existsSync('.env')) {
   process.loadEnvFile('.env');
@@ -55,6 +56,7 @@ const dbSsl = process.env.DB_SSL !== 'false';
     UserModule,
     PeerModule,
     MailModule,
+    ImageStorageModule,
   ],
   controllers: [AppController],
   providers: [AppService],
