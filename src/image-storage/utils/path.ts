@@ -26,14 +26,20 @@ export function normalizeDestinationFolder(folder: string): string {
 export function normalizeFileName(fileName: string): string {
   const normalizedFileName = fileName.trim();
 
-  if (!normalizedFileName) {
-    throw new BadRequestException('fileName cannot be empty');
+  if (!normalizedFileName || normalizedFileName.length > 255) {
+    throw new BadRequestException('fileName is invalid or too long');
+  }
+
+  // Allow only safe characters: letters, digits, hyphens, underscores, dots
+  if (!/^[a-zA-Z0-9._-]+$/.test(normalizedFileName)) {
+    throw new BadRequestException('fileName contains invalid characters');
   }
 
   if (
     normalizedFileName.includes('/') ||
     normalizedFileName.includes('\\') ||
-    normalizedFileName.includes('..')
+    normalizedFileName.includes('..') ||
+    normalizedFileName.startsWith('.')
   ) {
     throw new BadRequestException('Invalid fileName');
   }

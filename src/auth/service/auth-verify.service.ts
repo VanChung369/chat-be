@@ -1,6 +1,7 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
+import { timingSafeEqual } from 'crypto';
 import { MailService } from '../../mail/service/mail.service.js';
 import {
   TTL_RESET_PASSWORD_CODE,
@@ -52,7 +53,11 @@ export class AuthVerifyService {
       `verify_code_${email}`,
     );
 
-    if (savedCode && savedCode === code) {
+    if (
+      savedCode &&
+      savedCode.length === code.length &&
+      timingSafeEqual(Buffer.from(savedCode), Buffer.from(code))
+    ) {
       await this.cacheManager.del(`verify_code_${email}`);
       return true;
     }
@@ -94,10 +99,11 @@ export class AuthVerifyService {
       `reset_code_${email}`,
     );
 
-    if (savedCode && savedCode === code) {
-      // Don't delete yet? Or delete after successful password reset?
-      // Usually, it's safer to delete after the password is actually changed.
-      // But verifyCode deletes it immediately. Let's stick with that for consistency.
+    if (
+      savedCode &&
+      savedCode.length === code.length &&
+      timingSafeEqual(Buffer.from(savedCode), Buffer.from(code))
+    ) {
       await this.cacheManager.del(`reset_code_${email}`);
       return true;
     }

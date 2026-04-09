@@ -4,7 +4,10 @@ import {
   Controller,
   Delete,
   Inject,
+  MaxFileSizeValidator,
+  FileTypeValidator,
   Param,
+  ParseFilePipe,
   Post,
   UploadedFile,
   UseInterceptors,
@@ -17,6 +20,13 @@ import { UploadImageDto } from '../dto/upload-image.dto';
 import { mapUploadedFile } from '../../common/utils';
 import type { RequestUploadedFile } from '../../common/utils';
 
+const IMAGE_FILE_PIPE = new ParseFilePipe({
+  validators: [
+    new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 }), // 10 MB
+    new FileTypeValidator({ fileType: /^image\/(jpeg|png|webp|gif)$/ }),
+  ],
+});
+
 @Controller('image-storage')
 export class ImageStorageController {
   constructor(
@@ -27,13 +37,9 @@ export class ImageStorageController {
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   async upload(
-    @UploadedFile() file: RequestUploadedFile,
+    @UploadedFile(IMAGE_FILE_PIPE) file: RequestUploadedFile,
     @Body() uploadImageDto: UploadImageDto,
   ) {
-    if (!file) {
-      throw new BadRequestException('File is required');
-    }
-
     return this.imageStorageService.uploadToTemp({
       file: mapUploadedFile(file),
       fileName: uploadImageDto.fileName || file.originalname,
@@ -43,13 +49,9 @@ export class ImageStorageController {
   @Post('upload-direct')
   @UseInterceptors(FileInterceptor('file'))
   async uploadDirect(
-    @UploadedFile() file: RequestUploadedFile,
+    @UploadedFile(IMAGE_FILE_PIPE) file: RequestUploadedFile,
     @Body() uploadImageDto: UploadImageDto,
   ) {
-    if (!file) {
-      throw new BadRequestException('File is required');
-    }
-
     return this.imageStorageService.upload({
       file: mapUploadedFile(file),
       fileName: uploadImageDto.fileName || file.originalname,

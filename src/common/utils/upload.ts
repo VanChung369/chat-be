@@ -4,6 +4,7 @@ export type RequestUploadedFile = {
   buffer: Buffer;
   originalname: string;
   mimetype: string;
+  size: number;
 };
 
 export function mapUploadedFile(file: RequestUploadedFile): UploadedFile {

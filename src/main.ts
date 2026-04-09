@@ -25,7 +25,12 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
   app.set('trust proxy', 'loopback');
-  app.enableCors({ origin: true, credentials: true });
+  app.enableCors({
+    origin: process.env.CORS_ORIGIN?.split(',') ?? ['http://localhost:3000'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -41,6 +46,9 @@ async function bootstrap() {
       name: 'CHAT_SESSION_ID',
       cookie: {
         maxAge: Number(COOKIE_EXPIRES_IN ?? 86400000),
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
       },
       store: new TypeormStore().connect(sessionRepository),
     }),

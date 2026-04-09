@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { UpdateUserProfileParams } from '../../common/types';
 import { Profile } from '../../common/entities/profile.entity';
 import { User } from '../../common/entities/user.entity';
@@ -13,6 +13,7 @@ export class UserProfileService implements IUserProfileService {
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
     private readonly userRepository: UserRepository,
+    private readonly dataSource: DataSource,
   ) {}
 
   private async ensureProfile(user: User): Promise<void> {
@@ -20,9 +21,18 @@ export class UserProfileService implements IUserProfileService {
       return;
     }
 
-    user.profile = await this.profileRepository.save(
-      this.profileRepository.create(),
-    );
+    await this.dataSource.transaction(async (manager) => {
+      const existing = await manager.findOne(Profile, {
+        where: { user: { id: user.id } } as any,
+      });
+      if (existing) {
+        user.profile = existing;
+        return;
+      }
+      const profile = manager.create(Profile);
+      user.profile = await manager.save(Profile, profile);
+      await manager.save(User, user);
+    });
   }
 
   async createProfileOrUpdate(

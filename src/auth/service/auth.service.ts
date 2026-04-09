@@ -71,7 +71,8 @@ export class AuthService implements IAuthService {
   async forgotPassword(email: string): Promise<void> {
     const user = await this.userService.findUser({ email });
     if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      // Silently ignore to prevent email enumeration
+      return;
     }
     await this.authVerifyService.sendResetPasswordCode(email);
   }

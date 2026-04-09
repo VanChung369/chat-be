@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { UpdateUserPresenceParams } from '../../common/types';
 import { UserPresence } from '../../common/entities/user-presence.entity';
 import { User } from '../../common/entities/user.entity';
@@ -13,6 +13,7 @@ export class UserPresenceService implements IUserPresenceService {
     @InjectRepository(UserPresence)
     private readonly userPresenceRepository: Repository<UserPresence>,
     private readonly userRepository: UserRepository,
+    private readonly dataSource: DataSource,
   ) {}
 
   private async getUserWithPresence(userId: string): Promise<User> {
@@ -30,13 +31,20 @@ export class UserPresenceService implements IUserPresenceService {
       return user.presence;
     }
 
-    user.presence = await this.userPresenceRepository.save(
-      this.userPresenceRepository.create(),
-    );
+    await this.dataSource.transaction(async (manager) => {
+      const existing = await manager.findOne(UserPresence, {
+        where: { user: { id: user.id } } as any,
+      });
+      if (existing) {
+        user.presence = existing;
+        return;
+      }
+      const presence = manager.create(UserPresence);
+      user.presence = await manager.save(UserPresence, presence);
+      await manager.save(User, user);
+    });
 
-    await this.userRepository.save(user);
-
-    return user.presence;
+    return user.presence!;
   }
 
   async getPresence(user: User): Promise<UserPresence> {
