@@ -6,9 +6,12 @@ import {
   Injectable,
   Logger,
 } from '@nestjs/common';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 import { AuthVerifyService } from './auth-verify.service.js';
 
 import { User } from '../../common/entities/user.entity';
+import { Session } from '../../common/entities/session.entity';
 import { USER_SERVICE_TOKEN } from '../../users/interfaces/user.service.interface';
 import type { IUserService } from '../../users/interfaces/user.service.interface';
 import { compareHash, hashPassword } from '../../common/utils';
@@ -24,6 +27,7 @@ export class AuthService implements IAuthService {
     @Inject(USER_SERVICE_TOKEN)
     private readonly userService: IUserService,
     private readonly authVerifyService: AuthVerifyService,
+    @InjectDataSource() private readonly dataSource: DataSource,
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -92,6 +96,28 @@ export class AuthService implements IAuthService {
 
     const hashedPassword = await hashPassword(newPassword);
     await this.userService.updatePassword(email, hashedPassword);
+    await this.invalidateUserSessions(email);
+  }
+
+  private async invalidateUserSessions(email: string): Promise<void> {
+    const sessionRepo = this.dataSource.getRepository(Session);
+    const sessions = await sessionRepo.find();
+
+    const toDelete = sessions.filter((s) => {
+      try {
+        const data = JSON.parse(s.json) as {
+          passport?: { user?: string };
+        };
+        return data?.passport?.user === email;
+      } catch {
+        return false;
+      }
+    });
+
+    if (toDelete.length > 0) {
+      await sessionRepo.remove(toDelete);
+      this.logger.log(`Invalidated ${toDelete.length} session(s) for ${email}`);
+    }
   }
 
   async validateUser(userCredentials: ValidateUserLogin): Promise<User | null> {

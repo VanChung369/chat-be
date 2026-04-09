@@ -11,6 +11,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { AUTH_SERVICE_TOKEN } from '../interfaces/auth.service.interface';
 import type { IAuthService } from '../interfaces/auth.service.interface';
 import { RegisterDto } from '../dto/register.dto';
@@ -19,6 +20,9 @@ import { ResetPasswordDto } from '../dto/reset-password.dto';
 import { AuthenticatedGuard, LocalAuthGuard } from '../guards/access.guard';
 import type { Response } from 'express';
 import type { AuthenticatedRequest } from '../types';
+
+// Strict throttle for sensitive auth endpoints: 5 requests per minute
+const AUTH_THROTTLE = Throttle({ default: { ttl: 60_000, limit: 5 } });
 
 @Controller('auth')
 export class AuthController {
@@ -29,6 +33,7 @@ export class AuthController {
     private readonly authService: IAuthService,
   ) {}
 
+  @AUTH_THROTTLE
   @Post('register')
   register(@Body() registerDto: RegisterDto) {
     this.logger.log(
@@ -37,6 +42,7 @@ export class AuthController {
     return this.authService.register(registerDto);
   }
 
+  @AUTH_THROTTLE
   @Post('login')
   @UseGuards(LocalAuthGuard)
   login(@Res() res: Response) {
@@ -56,6 +62,7 @@ export class AuthController {
     });
   }
 
+  @AUTH_THROTTLE
   @Post('forgot-password')
   async forgotPassword(
     @Body() forgotPasswordDto: ForgotPasswordDto,
@@ -70,6 +77,7 @@ export class AuthController {
       .json({ message: 'Reset password code sent to your email' });
   }
 
+  @AUTH_THROTTLE
   @Post('reset-password')
   async resetPassword(
     @Body() resetPasswordDto: ResetPasswordDto,
@@ -88,6 +96,7 @@ export class AuthController {
       .json({ message: 'Password reset successfully' });
   }
 
+  @AUTH_THROTTLE
   @Post('verify')
   async verifyEmail(
     @Body() body: { email: string; code: string },
@@ -105,6 +114,7 @@ export class AuthController {
       .json({ message: 'Email verified successfully' });
   }
 
+  @AUTH_THROTTLE
   @Post('resend-code')
   async resendCode(@Body('email') email: string, @Res() res: Response) {
     await this.authService.resendVerificationCode(email);
@@ -113,5 +123,3 @@ export class AuthController {
       .json({ message: 'Resend verification code successfully' });
   }
 }
-
-

@@ -1,9 +1,11 @@
 import { existsSync } from 'node:fs';
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BullModule } from '@nestjs/bullmq';
 import { CacheModule } from '@nestjs/cache-manager';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { redisStore } from 'cache-manager-redis-yet';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
@@ -52,6 +54,13 @@ const dbSsl = process.env.DB_SSL !== 'false';
       }),
     }),
     ScheduleModule.forRoot(),
+    ThrottlerModule.forRoot([
+      {
+        name: 'default',
+        ttl: 60_000,
+        limit: 60,
+      },
+    ]),
     AuthModule,
     UserModule,
     PeerModule,
@@ -59,6 +68,6 @@ const dbSsl = process.env.DB_SSL !== 'false';
     ImageStorageModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule {}
