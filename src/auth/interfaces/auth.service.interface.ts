@@ -11,4 +11,9 @@ export interface IAuthService {
   resendVerificationCode(email: string): Promise<void>;
   forgotPassword(email: string): Promise<void>;
   resetPassword(email: string, code: string, newPassword: string): Promise<void>;
+  changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<void>;
 }

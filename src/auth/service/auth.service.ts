@@ -1,10 +1,12 @@
 import {
+  BadRequestException,
   ConflictException,
   HttpException,
   HttpStatus,
   Inject,
   Injectable,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
@@ -101,6 +103,41 @@ export class AuthService implements IAuthService {
 
     const hashedPassword = await hashPassword(newPassword);
     await this.userService.updatePassword(email, hashedPassword);
+    await this.invalidateUserSessions(user.id);
+  }
+
+  async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<void> {
+    const user = await this.userService.findUser(
+      { id: userId },
+      { selectAll: true },
+    );
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const isCurrentPasswordValid = await compareHash(
+      currentPassword,
+      user.password,
+    );
+
+    if (!isCurrentPasswordValid) {
+      throw new BadRequestException('Current password is incorrect');
+    }
+
+    const isSamePassword = await compareHash(newPassword, user.password);
+    if (isSamePassword) {
+      throw new BadRequestException(
+        'New password must be different from the current password',
+      );
+    }
+
+    const hashedPassword = await hashPassword(newPassword);
+    await this.userService.updatePassword(user.email, hashedPassword);
     await this.invalidateUserSessions(user.id);
   }
 

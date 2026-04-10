@@ -17,8 +17,11 @@ import type { IAuthService } from '../interfaces/auth.service.interface';
 import { RegisterDto } from '../dto/register.dto';
 import { ForgotPasswordDto } from '../dto/forgot-password.dto';
 import { ResetPasswordDto } from '../dto/reset-password.dto';
+import { ChangePasswordDto } from '../dto/change-password.dto';
 import { AuthenticatedGuard, LocalAuthGuard } from '../guards/access.guard';
 import type { Response } from 'express';
+import { AuthUser } from 'src/common/decorators/auth-user.decorator';
+import { User } from 'src/common/entities/user.entity';
 import type { AuthenticatedRequest } from '../types';
 
 // Strict throttle for sensitive auth endpoints: 5 requests per minute
@@ -52,8 +55,12 @@ export class AuthController {
 
   @Post('logout')
   @UseGuards(AuthenticatedGuard)
-  logout(@Req() req: AuthenticatedRequest, @Res() res: Response) {
-    this.logger.log('Logout route called');
+  logout(
+    @AuthUser() user: User,
+    @Req() req: AuthenticatedRequest,
+    @Res() res: Response,
+  ) {
+    this.logger.log(`Logout route called for user: ${user.id}`);
     return req.logout((error) => {
       if (error) {
         throw new InternalServerErrorException('Logout failed');
@@ -94,6 +101,25 @@ export class AuthController {
     return res
       .status(HttpStatus.OK)
       .json({ message: 'Password reset successfully' });
+  }
+
+  @AUTH_THROTTLE
+  @Post('change-password')
+  @UseGuards(AuthenticatedGuard)
+  async changePassword(
+    @AuthUser() user: User,
+    @Body() changePasswordDto: ChangePasswordDto,
+    @Res() res: Response,
+  ) {
+    this.logger.log(`Change password attempt for user: ${user.id}`);
+    await this.authService.changePassword(
+      user.id,
+      changePasswordDto.currentPassword,
+      changePasswordDto.newPassword,
+    );
+    return res.status(HttpStatus.OK).json({
+      message: 'Password changed successfully. Please log in again.',
+    });
   }
 
   @AUTH_THROTTLE
