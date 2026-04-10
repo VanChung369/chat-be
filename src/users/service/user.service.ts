@@ -1,18 +1,24 @@
-import { Injectable } from '@nestjs/common';
-import { FindOptionsSelect, FindOptionsWhere } from 'typeorm';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { DataSource, FindOptionsSelect, FindOptionsWhere } from 'typeorm';
 import { instanceToPlain } from 'class-transformer';
 import {
   FindUserParams,
   FindUserOptions,
   UpdateCurrentUserParams,
 } from 'src/common/types';
+import { pickDefined } from '../../common/utils';
 import { User } from '../../common/entities/user.entity';
+import { Profile } from '../../common/entities/profile.entity';
+import { UserPresence } from '../../common/entities/user-presence.entity';
 import { UserRepository } from '../repository/user.repository';
 import { IUserService } from '../interfaces/user.service.interface';
 
 @Injectable()
 export class UserService implements IUserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly dataSource: DataSource,
+  ) {}
 
   async createUser(params: {
     username: string;
@@ -101,18 +107,66 @@ export class UserService implements IUserService {
     user: User,
     params: UpdateCurrentUserParams,
   ): Promise<User> {
-    if (typeof params.username === 'string') {
-      user.name = params.username.trim();
+    await this.dataSource.transaction(async (manager) => {
+      const currentUser = await manager.findOne(User, {
+        where: { id: user.id },
+        relations: { profile: true, presence: true },
+      });
+
+      if (!currentUser) {
+        throw new Error('User not found');
+      }
+
+      if (!currentUser.profile) {
+        const profile = manager.create(Profile);
+        currentUser.profile = await manager.save(Profile, profile);
+      }
+
+      if (!currentUser.presence) {
+        const presence = manager.create(UserPresence);
+        currentUser.presence = await manager.save(UserPresence, presence);
+      }
+
+      Object.assign(
+        currentUser,
+        pickDefined({
+          name: params.username?.trim(),
+          firstName: params.firstName?.trim(),
+          lastName: params.lastName?.trim(),
+        }),
+      );
+
+      Object.assign(
+        currentUser.profile,
+        pickDefined({
+          about: params.about?.trim(),
+          phone: params.phone?.trim(),
+          avatar: params.avatarUrl,
+          banner: params.bannerUrl,
+        }),
+      );
+
+      Object.assign(
+        currentUser.presence,
+        pickDefined({
+          status: params.status,
+          statusMessage: params.statusMessage?.trim(),
+          showOffline:
+            params.showOnlineStatus !== undefined
+              ? !params.showOnlineStatus
+              : undefined,
+        }),
+      );
+
+      await manager.save(User, currentUser);
+    });
+
+    const updatedUser = await this.userRepository.findById(user.id);
+
+    if (!updatedUser) {
+      throw new NotFoundException('User not found');
     }
 
-    if (typeof params.firstName === 'string') {
-      user.firstName = params.firstName.trim();
-    }
-
-    if (typeof params.lastName === 'string') {
-      user.lastName = params.lastName.trim();
-    }
-
-    return this.userRepository.save(user);
+    return updatedUser;
   }
 }

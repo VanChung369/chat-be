@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { UpdateUserPresenceParams } from '../../common/types';
+import { pickDefined } from '../../common/utils';
 import { UserPresence } from '../../common/entities/user-presence.entity';
 import { User } from '../../common/entities/user.entity';
 import { UserRepository } from '../repository/user.repository';
@@ -60,13 +61,14 @@ export class UserPresenceService implements IUserPresenceService {
     const currentUser = await this.getUserWithPresence(user.id);
     const presence = await this.ensurePresence(currentUser);
 
-    if (typeof params.statusMessage === 'string') {
-      presence.statusMessage = params.statusMessage;
-    }
-
-    if (typeof params.showOffline === 'boolean') {
-      presence.showOffline = params.showOffline;
-    }
+    Object.assign(
+      presence,
+      pickDefined({
+        status: params.status,
+        statusMessage: params.statusMessage,
+        showOffline: params.showOffline,
+      }),
+    );
 
     currentUser.presence = await this.userPresenceRepository.save(presence);
     await this.userRepository.save(currentUser);

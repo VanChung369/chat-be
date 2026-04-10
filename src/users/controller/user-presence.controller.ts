@@ -32,16 +32,9 @@ export class UserPresenceController {
     @AuthUser() user: User,
     @Body() updateUserPresenceDto: UpdateUserPresenceDto,
   ) {
-    const params: UpdateUserPresenceParams = {};
-
-    if (typeof updateUserPresenceDto.statusMessage === 'string') {
-      params.statusMessage = updateUserPresenceDto.statusMessage.trim();
-    }
-
-    if (typeof updateUserPresenceDto.showOffline === 'boolean') {
-      params.showOffline = updateUserPresenceDto.showOffline;
-    }
-
-    return this.userPresenceService.createPresenceOrUpdate(user, params);
+    return this.userPresenceService.createPresenceOrUpdate(
+      user,
+      updateUserPresenceDto,
+    );
   }
 }

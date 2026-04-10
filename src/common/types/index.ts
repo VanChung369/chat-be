@@ -13,3 +13,4 @@ export type {
   UpdateUserPresenceParams,
   UserProfileFiles,
 } from './user';
+export { UserStatus } from './user';

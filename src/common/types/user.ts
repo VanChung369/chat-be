@@ -11,20 +11,29 @@ export type FindUserOptions = Partial<{
   selectAll: boolean;
 }>;
 
+export enum UserStatus {
+  Online = 'online',
+  Away = 'away',
+  Busy = 'busy',
+}
+
 export type UpdateCurrentUserParams = Partial<{
   username: string;
   firstName: string;
   lastName: string;
-}>;
-
-export type UpdateUserProfileParams = Partial<{
   about: string;
   phone: string;
   avatarUrl: string;
   bannerUrl: string;
+  status: UserStatus;
+  statusMessage: string;
+  showOnlineStatus: boolean;
 }>;
 
+export type UpdateUserProfileParams = UpdateCurrentUserParams;
+
 export type UpdateUserPresenceParams = Partial<{
+  status: UserStatus;
   statusMessage: string;
   showOffline: boolean;
 }>;
