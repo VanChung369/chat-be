@@ -94,29 +94,32 @@ export class AuthService implements IAuthService {
       );
     }
 
+    const user = await this.userService.findUser({ email });
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+
     const hashedPassword = await hashPassword(newPassword);
     await this.userService.updatePassword(email, hashedPassword);
-    await this.invalidateUserSessions(email);
+    await this.invalidateUserSessions(user.id);
   }
 
-  private async invalidateUserSessions(email: string): Promise<void> {
+  private async invalidateUserSessions(userId: string): Promise<void> {
     const sessionRepo = this.dataSource.getRepository(Session);
-    const sessions = await sessionRepo.find();
-
-    const toDelete = sessions.filter((s) => {
-      try {
-        const data = JSON.parse(s.json) as {
-          passport?: { user?: string };
-        };
-        return data?.passport?.user === email;
-      } catch {
-        return false;
-      }
-    });
+    // Use a parameterized LIKE query to avoid a full table scan.
+    // passport-local serializes the user as the UUID stored at passport.user.
+    const toDelete = await sessionRepo
+      .createQueryBuilder('session')
+      .where('session.json LIKE :pattern', {
+        pattern: `%"user":"${userId}"%`,
+      })
+      .getMany();
 
     if (toDelete.length > 0) {
       await sessionRepo.remove(toDelete);
-      this.logger.log(`Invalidated ${toDelete.length} session(s) for ${email}`);
+      this.logger.log(
+        `Invalidated ${toDelete.length} session(s) for user ${userId}`,
+      );
     }
   }
 

@@ -7,13 +7,13 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { redisStore } from 'cache-manager-redis-yet';
-import { AppController } from './app.controller.js';
-import { AppService } from './app.service.js';
-import { AuthModule } from './auth/auth.module.js';
-import { UserModule } from './users/user.module.js';
-import { PeerModule } from './peer/peer.module.js';
-import { MailModule } from './mail/mail.module.js';
-import { ImageStorageModule } from './image-storage/image-storage.module.js';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './users/user.module';
+import { PeerModule } from './peer/peer.module';
+import { MailModule } from './mail/mail.module';
+import { ImageStorageModule } from './image-storage/image-storage.module';
 
 if (existsSync('.env')) {
   process.loadEnvFile('.env');
@@ -31,7 +31,7 @@ const dbSsl = process.env.DB_SSL !== 'false';
       ssl: dbSsl ? { rejectUnauthorized: false } : false,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       migrations: [__dirname + '/common/migrate/*{.ts,.js}'],
-      migrationsRun: true,
+      migrationsRun: false,
       synchronize: dbSynchronize,
       logging: dbLogging,
       autoLoadEntities: true,

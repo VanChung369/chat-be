@@ -2,7 +2,7 @@ import { Injectable, Inject, Logger } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
 import { timingSafeEqual } from 'crypto';
-import { MailService } from '../../mail/service/mail.service.js';
+import { MailService } from '../../mail/service/mail.service';
 import {
   TTL_RESET_PASSWORD_CODE,
   TTL_VERIFY_CODE,
@@ -25,7 +25,7 @@ export class AuthVerifyService {
   }
 
   /**
-   * Generates a code, saves it to cache with 120s TTL, and queues the verification email.
+   * Generates a code, saves it to cache with TTL_VERIFY_CODE (1 hour), and queues the verification email.
    * @param email The recipient's email address.
    */
   async sendVerificationCode(email: string) {
@@ -66,14 +66,13 @@ export class AuthVerifyService {
   }
 
   /**
-   * Generates a code, saves it to cache with 120s TTL (2m), and queues the reset email.
+   * Generates a code, saves it to cache with TTL_RESET_PASSWORD_CODE (30 minutes), and queues the reset email.
    * @param email The recipient's email address.
    */
   async sendResetPasswordCode(email: string) {
     const code = this.generateCode();
 
     // Save to cache (TTL is in milliseconds for modern cache-manager)
-    // 120s = 2 minutes
     await this.cacheManager.set(
       `reset_code_${email}`,
       code,

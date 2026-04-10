@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -10,9 +9,11 @@ import {
   ParseFilePipe,
   Post,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { AuthenticatedGuard } from '../../auth/guards/access.guard';
 import { IMAGE_STORAGE_SERVICE_TOKEN } from '../interfaces/image-storage.service.interface';
 import type { IImageStorageService } from '../interfaces/image-storage.service.interface';
 import { ConfirmTempUploadDto } from '../dto/confirm-temp-upload.dto';
@@ -27,6 +28,7 @@ const IMAGE_FILE_PIPE = new ParseFilePipe({
   ],
 });
 
+@UseGuards(AuthenticatedGuard)
 @Controller('image-storage')
 export class ImageStorageController {
   constructor(

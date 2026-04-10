@@ -70,9 +70,6 @@ export class UserPresenceService implements IUserPresenceService {
       }),
     );
 
-    currentUser.presence = await this.userPresenceRepository.save(presence);
-    await this.userRepository.save(currentUser);
-
-    return currentUser.presence;
+    return this.userPresenceRepository.save(presence);
   }
 }

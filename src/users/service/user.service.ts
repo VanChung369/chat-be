@@ -28,7 +28,7 @@ export class UserService implements IUserService {
     password: string;
   }) {
     const user = this.userRepository.create({
-      name: params.username,
+      userName: params.username,
       firstName: params.firstName,
       lastName: params.lastName,
       email: params.email,
@@ -54,7 +54,7 @@ export class UserService implements IUserService {
     }
 
     if (findUserParams.username) {
-      where.name = findUserParams.username;
+      where.userName = findUserParams.username;
     }
 
     if (findUserParams.isVerified) {
@@ -68,7 +68,7 @@ export class UserService implements IUserService {
     const select: FindOptionsSelect<User> = options?.selectAll
       ? {
           id: true,
-          name: true,
+          userName: true,
           email: true,
           firstName: true,
           lastName: true,
@@ -79,7 +79,7 @@ export class UserService implements IUserService {
         }
       : {
           id: true,
-          name: true,
+          userName: true,
           email: true,
           firstName: true,
           lastName: true,
@@ -130,7 +130,7 @@ export class UserService implements IUserService {
       Object.assign(
         currentUser,
         pickDefined({
-          name: params.username?.trim(),
+          userName: params.username?.trim(),
           firstName: params.firstName?.trim(),
           lastName: params.lastName?.trim(),
         }),

@@ -4,9 +4,9 @@ import { AuthController } from './controller/auth.controller';
 import { AuthService } from './service/auth.service';
 import { AuthenticatedGuard, LocalAuthGuard } from './guards/access.guard';
 import { LocalStrategy } from './guards/local.strategy';
-import { SessionSerializer } from './guards/session.serializer.js';
-import { MailModule } from '../mail/mail.module.js';
-import { AuthVerifyService } from './service/auth-verify.service.js';
+import { SessionSerializer } from './guards/session.serializer';
+import { MailModule } from '../mail/mail.module';
+import { AuthVerifyService } from './service/auth-verify.service';
 import { AUTH_SERVICE_TOKEN } from './interfaces/auth.service.interface';
 
 @Module({

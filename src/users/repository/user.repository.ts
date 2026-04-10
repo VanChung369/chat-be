@@ -48,7 +48,7 @@ export class UserRepository extends BaseRepository<User> {
     return this.repository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.profile', 'profile')
-      .where('user.name ILIKE :query', { query: `%${query}%` })
+      .where('user.userName ILIKE :query', { query: `%${query}%` })
       .orderBy('user.createdAt', 'DESC')
       .take(10)
       .getMany();

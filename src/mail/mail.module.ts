@@ -3,8 +3,8 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/adapters/handlebars.adapter';
 import { BullModule } from '@nestjs/bullmq';
 import { join } from 'path';
-import { MailService } from './service/mail.service.js';
-import { MailProcessor } from './processor/mail.processor.js';
+import { MailService } from './service/mail.service';
+import { MailProcessor } from './processor/mail.processor';
 
 @Module({
   imports: [
