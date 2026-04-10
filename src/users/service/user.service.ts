@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { FindOptionsSelect, FindOptionsWhere } from 'typeorm';
 import { instanceToPlain } from 'class-transformer';
-import { FindUserParams, FindUserOptions } from 'src/common/types';
+import {
+  FindUserParams,
+  FindUserOptions,
+  UpdateCurrentUserParams,
+} from 'src/common/types';
 import { User } from '../../common/entities/user.entity';
 import { UserRepository } from '../repository/user.repository';
 import { IUserService } from '../interfaces/user.service.interface';
@@ -91,5 +95,24 @@ export class UserService implements IUserService {
 
   async updatePassword(email: string, password: string): Promise<void> {
     await this.userRepository.update({ email }, { password });
+  }
+
+  async updateCurrentUser(
+    user: User,
+    params: UpdateCurrentUserParams,
+  ): Promise<User> {
+    if (typeof params.username === 'string') {
+      user.name = params.username.trim();
+    }
+
+    if (typeof params.firstName === 'string') {
+      user.firstName = params.firstName.trim();
+    }
+
+    if (typeof params.lastName === 'string') {
+      user.lastName = params.lastName.trim();
+    }
+
+    return this.userRepository.save(user);
   }
 }

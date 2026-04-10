@@ -8,6 +8,7 @@ export type {
 export type {
   FindUserParams,
   FindUserOptions,
+  UpdateCurrentUserParams,
   UpdateUserProfileParams,
   UpdateUserPresenceParams,
   UserProfileFiles,

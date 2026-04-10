@@ -9,6 +9,9 @@ export class Profile {
   @Column({ type: 'varchar', default: '' })
   about?: string;
 
+  @Column({ type: 'varchar', default: '' })
+  phone?: string;
+
   @Column({ type: 'varchar', nullable: true })
   avatar?: string;
 
@@ -18,4 +21,3 @@ export class Profile {
   @OneToOne(() => User)
   user: User | undefined;
 }
-

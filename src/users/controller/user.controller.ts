@@ -1,18 +1,21 @@
 import {
   BadRequestException,
-  ConflictException,
   Controller,
   Get,
   HttpStatus,
   Inject,
+  Patch,
+  Body,
   Query,
   UseGuards,
+  ConflictException,
 } from '@nestjs/common';
 import { AuthenticatedGuard } from '../../auth/guards/access.guard';
 import { User } from '../../common/entities/user.entity';
 import { USER_SERVICE_TOKEN } from '../interfaces/user.service.interface';
 import type { IUserService } from '../interfaces/user.service.interface';
 import { AuthUser } from 'src/common/decorators/auth-user.decorator';
+import { UpdateCurrentUserDto } from '../dto/update-current-user.dto';
 
 @Controller('users')
 export class UserController {
@@ -27,15 +30,24 @@ export class UserController {
     return user;
   }
 
+  @Patch('me')
+  @UseGuards(AuthenticatedGuard)
+  updateMe(
+    @AuthUser() user: User,
+    @Body() updateCurrentUserDto: UpdateCurrentUserDto,
+  ) {
+    return this.userService.updateCurrentUser(user, updateCurrentUserDto);
+  }
+
   @Get('check')
-  async checkUsername(@Query('username') username?: string) {
-    if (!username?.trim()) {
+  async checkUsername(@Query('email') email?: string) {
+    if (!email?.trim()) {
       throw new BadRequestException('Invalid Query');
     }
 
-    const user = await this.userService.findUser({ username: username.trim() });
+    const user = await this.userService.findUser({ email: email.trim() });
     if (user) {
-      throw new ConflictException('Username already exists');
+      throw new ConflictException('Email already exists');
     }
 
     return HttpStatus.OK;

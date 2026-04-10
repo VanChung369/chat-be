@@ -57,6 +57,10 @@ export class UserProfileService implements IUserProfileService {
       user.profile.about = params.about;
     }
 
+    if (typeof params.phone === 'string') {
+      user.profile.phone = params.phone;
+    }
+
     return this.userRepository.save(user);
   }
 }

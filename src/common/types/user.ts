@@ -11,8 +11,15 @@ export type FindUserOptions = Partial<{
   selectAll: boolean;
 }>;
 
+export type UpdateCurrentUserParams = Partial<{
+  username: string;
+  firstName: string;
+  lastName: string;
+}>;
+
 export type UpdateUserProfileParams = Partial<{
   about: string;
+  phone: string;
   avatarUrl: string;
   bannerUrl: string;
 }>;
