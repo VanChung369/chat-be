@@ -1,0 +1,3 @@
+display_name: Chat BE
+short_description: Implement and evolve the NestJS chat backend with repo-consistent patterns.
+default_prompt: Use this skill when modifying the chat backend's modules, controllers, services, repositories, entities, auth flows, env config, or backend tests.

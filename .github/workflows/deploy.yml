@@ -1,0 +1,60 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: deploy-backend-main
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Ensure deploy folder exists
+        run: |
+          mkdir -p /home/vanchung/deploy/backend
+
+      - name: Sync backend source
+        run: |
+          rsync -av --delete \
+            --exclude ".git" \
+            --exclude "node_modules" \
+            --exclude "dist" \
+            ./ /home/vanchung/deploy/backend/
+
+      - name: Write backend env file
+        run: |
+          echo "${{ secrets.ENV_FILE }}" > /home/vanchung/deploy/backend/.env
+
+      - name: Remove old backend container
+        run: |
+          docker rm -f chatfusion-backend || true
+
+      - name: Build backend image
+        run: |
+          docker build -t chatfusion-backend:latest /home/vanchung/deploy/backend
+
+      - name: Run backend container
+        run: |
+          docker run -d \
+            --name chatfusion-backend \
+            --restart unless-stopped \
+            --env-file /home/vanchung/deploy/backend/.env \
+            -p 8001:8001 \
+            chatfusion-backend:latest
+
+      - name: Health check backend
+        run: |
+          sleep 8
+          curl -I http://localhost:8001 || curl http://localhost:8001
+
+      - name: Cleanup dangling images
+        run: |
+          docker image prune -f

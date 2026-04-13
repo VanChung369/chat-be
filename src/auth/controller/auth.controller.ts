@@ -1,0 +1,151 @@
+import {
+  Body,
+  Controller,
+  HttpException,
+  HttpStatus,
+  Inject,
+  InternalServerErrorException,
+  Logger,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
+import { AUTH_SERVICE_TOKEN } from '../interfaces/auth.service.interface';
+import type { IAuthService } from '../interfaces/auth.service.interface';
+import { RegisterDto } from '../dto/register.dto';
+import { ForgotPasswordDto } from '../dto/forgot-password.dto';
+import { ResetPasswordDto } from '../dto/reset-password.dto';
+import { ChangePasswordDto } from '../dto/change-password.dto';
+import { AuthenticatedGuard, LocalAuthGuard } from '../guards/access.guard';
+import type { Response } from 'express';
+import { AuthUser } from 'src/common/decorators/auth-user.decorator';
+import { User } from 'src/common/entities/user.entity';
+import type { AuthenticatedRequest } from '../types';
+
+// Strict throttle for sensitive auth endpoints: 5 requests per minute
+const AUTH_THROTTLE = Throttle({ default: { ttl: 60_000, limit: 5 } });
+
+@Controller('auth')
+export class AuthController {
+  private readonly logger = new Logger(AuthController.name);
+
+  constructor(
+    @Inject(AUTH_SERVICE_TOKEN)
+    private readonly authService: IAuthService,
+  ) {}
+
+  @AUTH_THROTTLE
+  @Post('register')
+  register(@Body() registerDto: RegisterDto) {
+    this.logger.log(
+      `Incoming register request for email: ${registerDto.email}`,
+    );
+    return this.authService.register(registerDto);
+  }
+
+  @AUTH_THROTTLE
+  @Post('login')
+  @UseGuards(LocalAuthGuard)
+  login(@Res() res: Response) {
+    this.logger.log('Login route completed with LocalAuthGuard');
+    return res.status(HttpStatus.OK).json({ message: 'Login successful' });
+  }
+
+  @Post('logout')
+  @UseGuards(AuthenticatedGuard)
+  logout(
+    @AuthUser() user: User,
+    @Req() req: AuthenticatedRequest,
+    @Res() res: Response,
+  ) {
+    this.logger.log(`Logout route called for user: ${user.id}`);
+    return req.logout((error) => {
+      if (error) {
+        throw new InternalServerErrorException('Logout failed');
+      }
+      return res.status(HttpStatus.OK).json({ message: 'Logout successful' });
+    });
+  }
+
+  @AUTH_THROTTLE
+  @Post('forgot-password')
+  async forgotPassword(
+    @Body() forgotPasswordDto: ForgotPasswordDto,
+    @Res() res: Response,
+  ) {
+    this.logger.log(
+      `Forgot password request for email: ${forgotPasswordDto.email}`,
+    );
+    await this.authService.forgotPassword(forgotPasswordDto.email);
+    return res
+      .status(HttpStatus.OK)
+      .json({ message: 'Reset password code sent to your email' });
+  }
+
+  @AUTH_THROTTLE
+  @Post('reset-password')
+  async resetPassword(
+    @Body() resetPasswordDto: ResetPasswordDto,
+    @Res() res: Response,
+  ) {
+    this.logger.log(
+      `Reset password attempt for email: ${resetPasswordDto.email}`,
+    );
+    await this.authService.resetPassword(
+      resetPasswordDto.email,
+      resetPasswordDto.code,
+      resetPasswordDto.newPassword,
+    );
+    return res
+      .status(HttpStatus.OK)
+      .json({ message: 'Password reset successfully' });
+  }
+
+  @AUTH_THROTTLE
+  @Post('change-password')
+  @UseGuards(AuthenticatedGuard)
+  async changePassword(
+    @AuthUser() user: User,
+    @Body() changePasswordDto: ChangePasswordDto,
+    @Res() res: Response,
+  ) {
+    this.logger.log(`Change password attempt for user: ${user.id}`);
+    await this.authService.changePassword(
+      user.id,
+      changePasswordDto.currentPassword,
+      changePasswordDto.newPassword,
+    );
+    return res.status(HttpStatus.OK).json({
+      message: 'Password changed successfully. Please log in again.',
+    });
+  }
+
+  @AUTH_THROTTLE
+  @Post('verify')
+  async verifyEmail(
+    @Body() body: { email: string; code: string },
+    @Res() res: Response,
+  ) {
+    const isValid = await this.authService.verifyEmail(body.email, body.code);
+    if (!isValid) {
+      throw new HttpException(
+        'Token is invalid or expired',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return res
+      .status(HttpStatus.OK)
+      .json({ message: 'Email verified successfully' });
+  }
+
+  @AUTH_THROTTLE
+  @Post('resend-code')
+  async resendCode(@Body('email') email: string, @Res() res: Response) {
+    await this.authService.resendVerificationCode(email);
+    return res
+      .status(HttpStatus.OK)
+      .json({ message: 'Resend verification code successfully' });
+  }
+}

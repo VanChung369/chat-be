@@ -1,0 +1,15 @@
+services:
+  redis-db:
+    image: redis:latest
+    container_name: redis-db-chat
+    environment:
+      REDIS_HOST: redis-db
+    ports:
+      - ${REDIS_PORT:-6379}:6379
+    command: 'redis-server --save 20 1 --loglevel warning'
+    volumes:
+      - cache-redis:/data
+
+volumes:
+  cache-redis:
+    driver: local
