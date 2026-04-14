@@ -48,7 +48,7 @@ async function bootstrap() {
         maxAge: Number(COOKIE_EXPIRES_IN ?? 86400000),
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'strict',
       },
       store: new TypeormStore().connect(sessionRepository),
     }),
