@@ -24,7 +24,8 @@ async function bootstrap() {
   const sessionRepository = dataSource.getRepository(SessionEntity);
 
   app.setGlobalPrefix('api');
-  app.set('trust proxy', 'loopback');
+  // app.set('trust proxy', 'loopback');
+  app.set('trust proxy', 1);
   app.enableCors({
     origin: process.env.CORS_ORIGIN?.split(',') ?? ['http://localhost:3000'],
     credentials: true,
