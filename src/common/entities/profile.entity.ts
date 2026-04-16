@@ -19,5 +19,5 @@ export class Profile {
   banner?: string;
 
   @OneToOne(() => User)
-  user: User | undefined;
+  user!: User;
 }
