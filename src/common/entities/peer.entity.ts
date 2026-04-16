@@ -7,5 +7,5 @@ export class Peer {
   id!: string;
 
   @OneToOne(() => User, (user) => user.peer)
-  user: User | undefined;
+  user!: User;
 }

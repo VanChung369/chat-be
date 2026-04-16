@@ -4,6 +4,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -11,6 +12,7 @@ import {
 import { Profile } from './profile.entity';
 import { Peer } from './peer.entity';
 import { UserPresence } from './user-presence.entity';
+import { Message } from './message.entity';
 
 @Entity('users')
 export class User {
@@ -44,13 +46,17 @@ export class User {
 
   @OneToOne(() => Profile, { cascade: ['insert', 'update'] })
   @JoinColumn()
-  profile: Profile | undefined;
+  profile!: Profile;
 
   @OneToOne(() => Peer, { cascade: ['insert', 'remove', 'update'] })
   @JoinColumn()
-  peer: Peer | undefined;
+  peer!: Peer;
 
   @OneToOne(() => UserPresence, { cascade: ['insert', 'update'] })
   @JoinColumn()
-  presence: UserPresence | undefined;
+  presence!: UserPresence;
+
+  @OneToMany(() => Message, (message) => message.author)
+  @JoinColumn()
+  messages!: Message[];
 }
