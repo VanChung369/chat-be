@@ -2356,10 +2356,10 @@ buffer@^6.0.3:
     base64-js "^1.3.1"
     ieee754 "^1.2.1"
 
-bullmq@^5.73.1:
-  version "5.73.1"
-  resolved "https://registry.yarnpkg.com/bullmq/-/bullmq-5.73.1.tgz#8ea4101ff6a14e5d331b125fb9fdb1327ca3a9d8"
-  integrity sha512-BdcY5R8PR62VziZGBmjDqPDb1Hhok2j8CJRslAI03sqzJ8k0wW1m9doBjdzBk7rrwNc3wb18bL9m/dniJ9N14g==
+bullmq@^5.74.1:
+  version "5.74.1"
+  resolved "https://registry.yarnpkg.com/bullmq/-/bullmq-5.74.1.tgz#c5d293e08651b445da9389b3045c567f811091f1"
+  integrity sha512-GfJEos2zoOGM9xqkB7VZouwwFuejKFqm667cBcmbBekJXKqqXWk4QYP3Uy2pzgUwCbg1cR7GgGmGczM7fnhWSA==
   dependencies:
     cron-parser "4.9.0"
     ioredis "5.10.1"
