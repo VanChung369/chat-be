@@ -6,6 +6,14 @@ export type {
   UploadTempImageResult,
 } from './upload';
 export type {
+  AuthenticatedSocket,
+  AuthenticatedSocketRequest,
+  AuthenticatedSocketSession,
+  GatewaySocketData,
+  SocketSessionData,
+  SocketSessionPassport,
+} from './socket';
+export type {
   FindUserParams,
   FindUserOptions,
   UpdateCurrentUserParams,

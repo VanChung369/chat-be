@@ -14,6 +14,7 @@ import { UserPresence } from 'src/common/entities/user-presence.entity';
 import { USER_SERVICE_TOKEN } from './interfaces/user.service.interface';
 import { USER_PROFILE_SERVICE_TOKEN } from './interfaces/user-profile.service.interface';
 import { USER_PRESENCE_SERVICE_TOKEN } from './interfaces/user-presence.service.interface';
+import { UserPresenceGateway } from './gateway/user-presence.gateway';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Profile, Peer, UserPresence])],
@@ -23,6 +24,7 @@ import { USER_PRESENCE_SERVICE_TOKEN } from './interfaces/user-presence.service.
     UserRepository,
     UserProfileService,
     UserPresenceService,
+    UserPresenceGateway,
     { provide: USER_SERVICE_TOKEN, useExisting: UserService },
     { provide: USER_PROFILE_SERVICE_TOKEN, useExisting: UserProfileService },
     { provide: USER_PRESENCE_SERVICE_TOKEN, useExisting: UserPresenceService },
