@@ -10,6 +10,7 @@ import { redisStore } from 'cache-manager-redis-yet';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { ConversationModule } from './conversation/conversation.module';
 import { UserModule } from './users/user.module';
 import { PeerModule } from './peer/peer.module';
 import { MailModule } from './mail/mail.module';
@@ -62,6 +63,7 @@ const dbSsl = process.env.DB_SSL !== 'false';
       },
     ]),
     AuthModule,
+    ConversationModule,
     UserModule,
     PeerModule,
     MailModule,
