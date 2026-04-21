@@ -36,6 +36,10 @@ const dbSsl = process.env.DB_SSL !== 'false';
       synchronize: dbSynchronize,
       logging: dbLogging,
       autoLoadEntities: true,
+      invalidWhereValuesBehavior: {
+        null: 'throw',
+        undefined: 'throw',
+      },
     }),
     BullModule.forRoot({
       connection: {
